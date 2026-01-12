@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - โครงการผ่ากอ และบำรุงอ้อยตอ</title>
+    <title>Dashboard - โครงการผ่ากอ</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -13,8 +13,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Date Range Picker -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     
     <style>
         :root {
@@ -57,6 +55,14 @@
             font-size: 1rem;
         }
         
+        .data-source-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+        
         .stats-card {
             background: white;
             border-radius: 10px;
@@ -73,20 +79,18 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.12);
         }
         
-        .stats-card.warning { border-top-color: var(--warning-color); }
-        .stats-card.success { border-top-color: var(--secondary-color); }
-        .stats-card.danger { border-top-color: var(--danger-color); }
-        .stats-card.info { border-top-color: var(--info-color); }
+        .stats-card.data-sheet { border-top-color: #6f42c1; }
+        .stats-card.status-sheet { border-top-color: var(--secondary-color); }
+        .stats-card.comparison { border-top-color: var(--warning-color); }
         
         .stats-icon {
             font-size: 2.5rem;
             margin-bottom: 10px;
         }
         
-        .stats-card.warning .stats-icon { color: var(--warning-color); }
-        .stats-card.success .stats-icon { color: var(--secondary-color); }
-        .stats-card.danger .stats-icon { color: var(--danger-color); }
-        .stats-card.info .stats-icon { color: var(--info-color); }
+        .stats-card.data-sheet .stats-icon { color: #6f42c1; }
+        .stats-card.status-sheet .stats-icon { color: var(--secondary-color); }
+        .stats-card.comparison .stats-icon { color: var(--warning-color); }
         
         .stats-value {
             font-size: 2.2rem;
@@ -102,13 +106,11 @@
             letter-spacing: 1px;
         }
         
-        .stats-change {
-            font-size: 0.85rem;
+        .stats-subtext {
+            font-size: 0.8rem;
             margin-top: 5px;
+            color: #999;
         }
-        
-        .stats-change.positive { color: var(--secondary-color); }
-        .stats-change.negative { color: var(--danger-color); }
         
         .chart-card {
             background: white;
@@ -163,10 +165,9 @@
             font-weight: 600;
         }
         
-        .status-completed { background: #d4edda; color: #155724; }
         .status-pending { background: #fff3cd; color: #856404; }
-        .status-inprogress { background: #cce5ff; color: #004085; }
-        .status-cancelled { background: #f8d7da; color: #721c24; }
+        .status-completed { background: #d4edda; color: #155724; }
+        .status-waiting { background: #cce5ff; color: #004085; }
         
         .dashboard-nav {
             margin-bottom: 20px;
@@ -185,60 +186,6 @@
         
         .nav-pills .nav-link.active {
             background-color: var(--primary-color);
-        }
-        
-        .quick-action-btn {
-            background: white;
-            border: none;
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            box-shadow: var(--card-shadow);
-            transition: all 0.3s;
-            height: 100%;
-        }
-        
-        .quick-action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-            background-color: #f8f9fa;
-        }
-        
-        .quick-action-icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            color: var(--primary-color);
-        }
-        
-        .quick-action-label {
-            font-weight: 500;
-            color: #333;
-        }
-        
-        .data-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 20px;
-            height: 100%;
-        }
-        
-        .data-card h5 {
-            color: #333;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-        
-        .data-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #333;
-        }
-        
-        .data-label {
-            color: #6c757d;
-            font-size: 0.9rem;
         }
         
         .loading-overlay {
@@ -269,6 +216,46 @@
             border-bottom: none;
         }
         
+        .comparison-row {
+            background: linear-gradient(90deg, rgba(111, 66, 193, 0.1) 0%, rgba(52, 168, 83, 0.1) 100%);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .comparison-label {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .comparison-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .data-source-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .data-source-data { background: #6f42c1; }
+        .data-source-status { background: #34a853; }
+        
+        .tabs-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+        }
+        
+        .tab-pane {
+            padding: 15px 0;
+        }
+        
         @media (max-width: 768px) {
             .dashboard-title {
                 font-size: 1.6rem;
@@ -283,20 +270,13 @@
             }
         }
         
-        /* Animation for cards */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
         }
         
-        .fade-in-up {
-            animation: fadeInUp 0.5s ease-out;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -308,19 +288,29 @@
                 <span class="visually-hidden">กำลังโหลด...</span>
             </div>
             <h4 class="mt-3">กำลังโหลดข้อมูลจาก Google Sheet</h4>
-            <p class="text-muted">กรุณารอสักครู่...</p>
+            <p class="text-muted" id="loadingMessage">กรุณารอสักครู่...</p>
+            <div class="progress mt-4" style="height: 6px; width: 300px; margin: 0 auto;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" id="loadingProgress" style="width: 0%"></div>
+            </div>
         </div>
         
         <!-- Dashboard Header -->
-        <div class="dashboard-header">
+        <div class="dashboard-header fade-in">
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <h1 class="dashboard-title">
                         <i class="fas fa-chart-line me-2"></i>Dashboard โครงการผ่ากอ
                     </h1>
                     <p class="dashboard-subtitle">
-                        ระบบติดตามและวิเคราะห์ข้อมูลแปลงเกษตร | อัพเดตล่าสุด: <span id="lastUpdateTime">-</span>
+                        ระบบติดตามและวิเคราะห์ข้อมูลแปลงเกษตรจาก 2 แหล่งข้อมูล
+                        <span class="data-source-badge">
+                            <span class="data-source-indicator data-source-data"></span>Data (สมัคร)
+                            <span class="data-source-indicator data-source-status ms-2"></span>สถานะ (ดำเนินการแล้ว)
+                        </span>
                     </p>
+                    <div class="mt-2">
+                        <small><i class="fas fa-info-circle me-1"></i> อัพเดตล่าสุด: <span id="lastUpdateTime">-</span></small>
+                    </div>
                 </div>
                 <div class="col-md-4 text-md-end">
                     <button class="btn btn-light me-2" id="refreshDataBtn">
@@ -334,7 +324,7 @@
         </div>
         
         <!-- Dashboard Navigation -->
-        <div class="dashboard-nav">
+        <div class="dashboard-nav fade-in">
             <ul class="nav nav-pills">
                 <li class="nav-item">
                     <a class="nav-link active" href="#overview" data-tab="overview">
@@ -342,244 +332,334 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="#comparison" data-tab="comparison">
+                        <i class="fas fa-exchange-alt me-1"></i>เปรียบเทียบ
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#pending" data-tab="pending">
+                        <i class="fas fa-clock me-1"></i>รอดำเนินการ
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#completed" data-tab="completed">
+                        <i class="fas fa-check-circle me-1"></i>ดำเนินการแล้ว
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="#analysis" data-tab="analysis">
                         <i class="fas fa-chart-pie me-1"></i>การวิเคราะห์
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#geographic" data-tab="geographic">
-                        <i class="fas fa-map-marked-alt me-1"></i>ภูมิศาสตร์
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#status" data-tab="status">
-                        <i class="fas fa-clipboard-check me-1"></i>สถานะงาน
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#reports" data-tab="reports">
-                        <i class="fas fa-file-alt me-1"></i>รายงาน
                     </a>
                 </li>
             </ul>
         </div>
         
-        <!-- Filter Section -->
-        <div class="filter-section">
-            <div class="row">
-                <div class="col-md-3 mb-3">
-                    <label class="form-label fw-bold">ช่วงวันที่</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                        <input type="text" class="form-control" id="dateRangePicker" placeholder="เลือกช่วงวันที่">
+        <!-- Overview Tab Content -->
+        <div id="overviewTab" class="tab-content fade-in">
+            <!-- Stats Row -->
+            <div class="row mb-4">
+                <!-- Data Sheet Stats -->
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card data-sheet">
+                        <div class="stats-icon">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="stats-value" id="totalDataPlots">0</div>
+                        <div class="stats-label">แปลงที่สมัคร (Data)</div>
+                        <div class="stats-subtext">รอดำเนินการทั้งหมด</div>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label fw-bold">เขตพื้นที่</label>
-                    <select class="form-select" id="zoneFilter">
-                        <option value="">ทั้งหมด</option>
-                        <!-- Options will be populated by JavaScript -->
-                    </select>
+                
+                <!-- Status Sheet Stats -->
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card status-sheet">
+                        <div class="stats-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stats-value" id="totalStatusPlots">0</div>
+                        <div class="stats-label">แปลงดำเนินการแล้ว (สถานะ)</div>
+                        <div class="stats-subtext">ดำเนินการเสร็จสิ้น</div>
+                    </div>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label fw-bold">พันธุ์อ้อย</label>
-                    <select class="form-select" id="varietyFilter">
-                        <option value="">ทั้งหมด</option>
-                        <!-- Options will be populated by JavaScript -->
-                    </select>
+                
+                <!-- Comparison Stats -->
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card comparison">
+                        <div class="stats-icon">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="stats-value" id="completionRate">0%</div>
+                        <div class="stats-label">อัตราการดำเนินการ</div>
+                        <div class="stats-subtext">ดำเนินการแล้ว / สมัครทั้งหมด</div>
+                    </div>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label fw-bold">สถานะ</label>
-                    <select class="form-select" id="statusFilter">
-                        <option value="">ทั้งหมด</option>
-                        <option value="completed">ดำเนินการแล้ว</option>
-                        <option value="pending">รอดำเนินการ</option>
-                        <option value="inprogress">กำลังดำเนินการ</option>
-                    </select>
+                
+                <!-- Remaining Stats -->
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card" style="border-top-color: var(--danger-color);">
+                        <div class="stats-icon" style="color: var(--danger-color);">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <div class="stats-value" id="remainingPlots">0</div>
+                        <div class="stats-label">แปลงรอดำเนินการ</div>
+                        <div class="stats-subtext">ยังไม่ได้ดำเนินการ</div>
+                    </div>
                 </div>
-                <div class="col-12">
-                    <div class="d-flex justify-content-between">
-                        <button class="btn btn-primary" id="applyFilterBtn">
-                            <i class="fas fa-filter me-1"></i> ใช้ตัวกรอง
-                        </button>
-                        <button class="btn btn-outline-secondary" id="resetFilterBtn">
-                            <i class="fas fa-times me-1"></i> ล้างตัวกรอง
-                        </button>
+            </div>
+            
+            <!-- Comparison Charts -->
+            <div class="row mb-4">
+                <div class="col-lg-6 mb-3">
+                    <div class="chart-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-chart-pie me-2"></i>สถานะแปลงเกษตรทั้งหมด
+                        </h5>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="overallStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-3">
+                    <div class="chart-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-chart-bar me-2"></i>เปรียบเทียบตามเขตพื้นที่
+                        </h5>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="zoneComparisonChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Summary Information -->
+            <div class="row">
+                <div class="col-lg-6 mb-3">
+                    <div class="chart-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-info-circle me-2"></i>สรุปข้อมูลสำคัญ
+                        </h5>
+                        <div class="comparison-row">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="comparison-label">แปลงซ้ำซ้อน</div>
+                                    <div class="comparison-value text-warning" id="duplicatePlots">0</div>
+                                    <small>แปลงที่อยู่ในทั้งสองชีท</small>
+                                </div>
+                                <div class="col-6">
+                                    <div class="comparison-label">แปลงเฉพาะ</div>
+                                    <div class="comparison-value text-info" id="uniquePlots">0</div>
+                                    <small>แปลงที่อยู่ในชีทเดียว</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-item">
+                            <div class="d-flex justify-content-between">
+                                <span>เกษตรกรทั้งหมด (Data)</span>
+                                <span class="fw-bold" id="totalDataFarmers">0</span>
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="d-flex justify-content-between">
+                                <span>เกษตรกรทั้งหมด (สถานะ)</span>
+                                <span class="fw-bold" id="totalStatusFarmers">0</span>
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="d-flex justify-content-between">
+                                <span>พันธุ์อ้อยทั้งหมด</span>
+                                <span class="fw-bold" id="totalVarieties">0</span>
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="d-flex justify-content-between">
+                                <span>เขตพื้นที่ทั้งหมด</span>
+                                <span class="fw-bold" id="totalZones">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6 mb-3">
+                    <div class="chart-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-bullseye me-2"></i>เป้าหมายและความคืบหน้า
+                        </h5>
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>ความคืบหน้าทั้งหมด</span>
+                                <span id="progressPercentage">0%</span>
+                            </div>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     id="progressBar" style="width: 0%; background-color: #6f42c1;"></div>
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     style="width: 0%; background-color: #34a853;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-1">
+                                <small><span class="data-source-indicator data-source-data"></span> รอดำเนินการ</small>
+                                <small><span class="data-source-indicator data-source-status"></span> ดำเนินการแล้ว</small>
+                            </div>
+                        </div>
+                        
+                        <div class="row text-center mt-4">
+                            <div class="col-6">
+                                <div class="p-3" style="background: #f8f9fa; border-radius: 8px;">
+                                    <div class="fs-4 fw-bold" id="targetPlots">0</div>
+                                    <div class="small text-muted">เป้าหมายทั้งหมด</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3" style="background: #f8f9fa; border-radius: 8px;">
+                                    <div class="fs-4 fw-bold" id="achievementRate">0%</div>
+                                    <div class="small text-muted">บรรลุเป้าหมาย</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Overview Tab Content -->
-        <div id="overviewTab" class="tab-content">
-            <!-- Stats Row -->
-            <div class="row mb-4 fade-in-up">
-                <div class="col-lg-3 col-md-6 mb-3">
-                    <div class="stats-card">
-                        <div class="stats-icon">
-                            <i class="fas fa-tractor"></i>
-                        </div>
-                        <div class="stats-value" id="totalPlots">0</div>
-                        <div class="stats-label">แปลงเกษตรทั้งหมด</div>
-                        <div class="stats-change positive" id="plotChange">
-                            <i class="fas fa-arrow-up me-1"></i>0% จากเดือนที่แล้ว
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-3">
-                    <div class="stats-card success">
-                        <div class="stats-icon">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="stats-value" id="completedPlots">0</div>
-                        <div class="stats-label">แปลงดำเนินการแล้ว</div>
-                        <div class="stats-label" id="completedPercentage">0%</div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-3">
-                    <div class="stats-card warning">
-                        <div class="stats-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="stats-value" id="pendingPlots">0</div>
-                        <div class="stats-label">แปลงรอดำเนินการ</div>
-                        <div class="stats-label" id="pendingPercentage">0%</div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-3">
-                    <div class="stats-card info">
-                        <div class="stats-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="stats-value" id="totalFarmers">0</div>
-                        <div class="stats-label">เกษตรกรทั้งหมด</div>
-                        <div class="stats-change positive" id="farmerChange">
-                            <i class="fas fa-arrow-up me-1"></i>0% จากเดือนที่แล้ว
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Charts Row -->
+        <!-- Comparison Tab Content -->
+        <div id="comparisonTab" class="tab-content" style="display: none;">
             <div class="row mb-4">
-                <div class="col-lg-6 mb-3">
+                <div class="col-12 mb-3">
                     <div class="chart-card">
                         <h5 class="chart-title">
-                            <i class="fas fa-chart-bar me-2"></i>จำนวนแปลงตามเขตพื้นที่
-                        </h5>
-                        <div class="chart-container" style="position: relative; height: 300px;">
-                            <canvas id="zoneChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 mb-3">
-                    <div class="chart-card">
-                        <h5 class="chart-title">
-                            <i class="fas fa-chart-pie me-2"></i>สัดส่วนพันธุ์อ้อย
-                        </h5>
-                        <div class="chart-container" style="position: relative; height: 300px;">
-                            <canvas id="varietyChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Quick Actions & Summary -->
-            <div class="row mb-4">
-                <div class="col-lg-4 mb-3">
-                    <div class="data-card">
-                        <h5><i class="fas fa-bolt me-2"></i>ข้อมูลเร่งด่วน</h5>
-                        <div class="summary-item">
-                            <div class="d-flex justify-content-between">
-                                <span>แปลงที่ใกล้ครบกำหนด</span>
-                                <span class="badge bg-warning" id="urgentPlots">0</span>
-                            </div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="d-flex justify-content-between">
-                                <span>แปลงขาดรูปภาพ</span>
-                                <span class="badge bg-danger" id="missingImages">0</span>
-                            </div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="d-flex justify-content-between">
-                                <span>แปลงไม่มีข้อมูลเลขแปลง</span>
-                                <span class="badge bg-info" id="missingPlotNumbers">0</span>
-                            </div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="d-flex justify-content-between">
-                                <span>แปลงดำเนินการล่าสุด (7 วัน)</span>
-                                <span class="badge bg-success" id="recentCompleted">0</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4 mb-3">
-                    <div class="data-card">
-                        <h5><i class="fas fa-calendar-check me-2"></i>สถิติตามเดือน</h5>
-                        <div class="chart-container" style="position: relative; height: 200px;">
-                            <canvas id="monthlyChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4 mb-3">
-                    <div class="data-card">
-                        <h5><i class="fas fa-tachometer-alt me-2"></i>ประสิทธิภาพ</h5>
-                        <div class="summary-item">
-                            <div class="d-flex justify-content-between">
-                                <span>อัตราการดำเนินการ</span>
-                                <span class="fw-bold" id="completionRate">0%</span>
-                            </div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="d-flex justify-content-between">
-                                <span>แปลงต่อเกษตรกร</span>
-                                <span class="fw-bold" id="plotsPerFarmer">0</span>
-                            </div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="d-flex justify-content-between">
-                                <span>ระยะเวลาดำเนินการเฉลี่ย (วัน)</span>
-                                <span class="fw-bold" id="avgDuration">0</span>
-                            </div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="d-flex justify-content-between">
-                                <span>แปลงที่มีรูปภาพครบถ้วน</span>
-                                <span class="fw-bold" id="plotsWithImages">0%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Recent Activity -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="table-card">
-                        <h5 class="chart-title">
-                            <i class="fas fa-history me-2"></i>กิจกรรมล่าสุด
+                            <i class="fas fa-balance-scale me-2"></i>เปรียบเทียบข้อมูลรายเขตพื้นที่
                         </h5>
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>เลขแปลง</th>
-                                        <th>เกษตรกร</th>
-                                        <th>เขต</th>
-                                        <th>พันธุ์</th>
-                                        <th>วันที่รอ้ มปลอด</th>
-                                        <th>สถานะ</th>
-                                        <th>รูปภาพ</th>
+                                        <th>เขตพื้นที่</th>
+                                        <th class="text-center">
+                                            <span class="data-source-indicator data-source-data"></span>
+                                            สมัคร (Data)
+                                        </th>
+                                        <th class="text-center">
+                                            <span class="data-source-indicator data-source-status"></span>
+                                            ดำเนินการแล้ว (สถานะ)
+                                        </th>
+                                        <th class="text-center">รอดำเนินการ</th>
+                                        <th class="text-center">อัตราการดำเนินการ</th>
+                                        <th class="text-center">สถานะ</th>
                                     </tr>
                                 </thead>
-                                <tbody id="recentActivityTable">
+                                <tbody id="zoneComparisonTable">
                                     <!-- Data will be populated by JavaScript -->
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-lg-6 mb-3">
+                    <div class="chart-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-chart-line me-2"></i>แนวโน้มอัตราการดำเนินการ
+                        </h5>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6 mb-3">
+                    <div class="chart-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-tachometer-alt me-2"></i>ประสิทธิภาพตามพื้นที่
+                        </h5>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="efficiencyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pending Tab Content -->
+        <div id="pendingTab" class="tab-content" style="display: none;">
+            <div class="row mb-4">
+                <div class="col-12 mb-3">
+                    <div class="chart-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-clock me-2"></i>แปลงเกษตรที่รอดำเนินการ (จากชีท Data)
+                        </h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>เลขแปลง</th>
+                                        <th>เกษตรกร</th>
+                                        <th>เขตพื้นที่</th>
+                                        <th>พันธุ์อ้อย</th>
+                                        <th>พื้นที่ (ไร่)</th>
+                                        <th>วันที่สมัคร</th>
+                                        <th>สถานะ</th>
+                                        <th>การดำเนินการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pendingTable">
+                                    <!-- Data will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-3">
+                            <div class="d-flex justify-content-between">
+                                <button class="btn btn-sm btn-outline-primary" id="exportPendingBtn">
+                                    <i class="fas fa-download me-1"></i> ดาวน์โหลดรายการ
+                                </button>
+                                <div class="text-muted">
+                                    แสดง <span id="pendingCount">0</span> รายการจากทั้งหมด <span id="totalPending">0</span> รายการ
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Completed Tab Content -->
+        <div id="completedTab" class="tab-content" style="display: none;">
+            <div class="row mb-4">
+                <div class="col-12 mb-3">
+                    <div class="chart-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-check-circle me-2"></i>แปลงเกษตรที่ดำเนินการแล้ว (จากชีท สถานะ)
+                        </h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>เลขแปลง</th>
+                                        <th>เกษตรกร</th>
+                                        <th>เขตพื้นที่</th>
+                                        <th>พันธุ์อ้อย</th>
+                                        <th>วันที่ดำเนินการ</th>
+                                        <th>รูปภาพ</th>
+                                        <th>หมายเหตุ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="completedTable">
+                                    <!-- Data will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-3">
+                            <div class="d-flex justify-content-between">
+                                <button class="btn btn-sm btn-outline-success" id="exportCompletedBtn">
+                                    <i class="fas fa-download me-1"></i> ดาวน์โหลดรายการ
+                                </button>
+                                <div class="text-muted">
+                                    แสดง <span id="completedCount">0</span> รายการจากทั้งหมด <span id="totalCompleted">0</span> รายการ
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -589,142 +669,49 @@
         <!-- Analysis Tab Content -->
         <div id="analysisTab" class="tab-content" style="display: none;">
             <div class="row mb-4">
-                <div class="col-12 mb-3">
-                    <div class="chart-card">
-                        <h5 class="chart-title">
-                            <i class="fas fa-chart-line me-2"></i>แนวโน้มการดำเนินงาน
-                        </h5>
-                        <div class="chart-container" style="position: relative; height: 350px;">
-                            <canvas id="trendChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="row mb-4">
-                <div class="col-lg-6 mb-3">
-                    <div class="chart-card">
-                        <h5 class="chart-title">
-                            <i class="fas fa-calendar-alt me-2"></i>ความคืบหน้าตามเดือน
-                        </h5>
-                        <div class="chart-container" style="position: relative; height: 300px;">
-                            <canvas id="progressChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6 mb-3">
-                    <div class="chart-card">
-                        <h5 class="chart-title">
-                            <i class="fas fa-chart-area me-2"></i>การกระจายตัวตามช่วงเวลา
-                        </h5>
-                        <div class="chart-container" style="position: relative; height: 300px;">
-                            <canvas id="distributionChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Geographic Tab Content -->
-        <div id="geographicTab" class="tab-content" style="display: none;">
-            <div class="row mb-4">
-                <div class="col-12 mb-3">
-                    <div class="chart-card">
-                        <h5 class="chart-title">
-                            <i class="fas fa-map me-2"></i>แผนที่การกระจายแปลงเกษตร
-                        </h5>
-                        <div id="mapContainer" style="height: 400px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                            <div class="text-center">
-                                <i class="fas fa-map-marked-alt fa-4x text-muted mb-3"></i>
-                                <h5>แผนที่การกระจายแปลง</h5>
-                                <p class="text-muted">ระบบแสดงแผนที่ (เตรียมการ)</p>
-                                <button class="btn btn-primary mt-2" id="loadMapBtn">
-                                    <i class="fas fa-map-marked-alt me-1"></i> โหลดแผนที่
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-lg-6 mb-3">
-                    <div class="data-card">
-                        <h5><i class="fas fa-globe-asia me-2"></i>ข้อมูลตามภูมิภาค</h5>
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>เขตพื้นที่</th>
-                                        <th>จำนวนแปลง</th>
-                                        <th>เกษตรกร</th>
-                                        <th>ดำเนินการแล้ว</th>
-                                        <th>ความคืบหน้า</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="zoneSummaryTable">
-                                    <!-- Data will be populated by JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-lg-6 mb-3">
-                    <div class="data-card">
-                        <h5><i class="fas fa-trophy me-2"></i>เขตพื้นที่ที่มีการดำเนินการสูงสุด</h5>
-                        <div id="topZonesChart">
-                            <!-- Chart will be populated by JavaScript -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Status Tab Content -->
-        <div id="statusTab" class="tab-content" style="display: none;">
-            <div class="row mb-4">
                 <div class="col-lg-8 mb-3">
                     <div class="chart-card">
                         <h5 class="chart-title">
-                            <i class="fas fa-clipboard-list me-2"></i>สถานะการดำเนินงานทั้งหมด
+                            <i class="fas fa-chart-area me-2"></i>การวิเคราะห์เชิงลึก
                         </h5>
                         <div class="chart-container" style="position: relative; height: 350px;">
-                            <canvas id="statusChart"></canvas>
+                            <canvas id="analysisChart"></canvas>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-4 mb-3">
-                    <div class="data-card">
-                        <h5><i class="fas fa-info-circle me-2"></i>สรุปสถานะ</h5>
+                    <div class="chart-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-calculator me-2"></i>ตัวชี้วัดประสิทธิภาพ
+                        </h5>
                         <div class="summary-item">
                             <div class="d-flex justify-content-between">
-                                <span>ดำเนินการแล้ว</span>
-                                <span class="badge bg-success" id="statusCompleted">0</span>
+                                <span>อัตราการดำเนินการเฉลี่ย</span>
+                                <span class="fw-bold" id="avgCompletionRate">0%</span>
                             </div>
                         </div>
                         <div class="summary-item">
                             <div class="d-flex justify-content-between">
-                                <span>รอดำเนินการ</span>
-                                <span class="badge bg-warning" id="statusPending">0</span>
+                                <span>แปลงต่อเกษตรกร (Data)</span>
+                                <span class="fw-bold" id="plotsPerFarmerData">0.0</span>
                             </div>
                         </div>
                         <div class="summary-item">
                             <div class="d-flex justify-content-between">
-                                <span>กำลังดำเนินการ</span>
-                                <span class="badge bg-info" id="statusInProgress">0</span>
+                                <span>แปลงต่อเกษตรกร (สถานะ)</span>
+                                <span class="fw-bold" id="plotsPerFarmerStatus">0.0</span>
                             </div>
                         </div>
                         <div class="summary-item">
                             <div class="d-flex justify-content-between">
-                                <span>ยังไม่ระบุ</span>
-                                <span class="badge bg-secondary" id="statusUnknown">0</span>
+                                <span>เขตพื้นที่ที่มีการดำเนินการสูงสุด</span>
+                                <span class="fw-bold" id="topZone">-</span>
                             </div>
                         </div>
-                        <div class="mt-4">
-                            <h6>แปลงที่ต้องติดตาม</h6>
-                            <div id="trackingPlots">
-                                <!-- Data will be populated by JavaScript -->
+                        <div class="summary-item">
+                            <div class="d-flex justify-content-between">
+                                <span>พันธุ์อ้อยที่นิยมที่สุด</span>
+                                <span class="fw-bold" id="topVariety">-</span>
                             </div>
                         </div>
                     </div>
@@ -733,110 +720,30 @@
             
             <div class="row">
                 <div class="col-12">
-                    <div class="table-card">
-                        <h5 class="chart-title">
-                            <i class="fas fa-list-ul me-2"></i>รายการแปลงรอดำเนินการ
-                        </h5>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>เลขแปลง</th>
-                                        <th>เกษตรกร</th>
-                                        <th>เขต</th>
-                                        <th>พันธุ์</th>
-                                        <th>วันที่รอ้ มปลอด</th>
-                                        <th>วันที่คาดดำเนินการ</th>
-                                        <th>ความเร่งด่วน</th>
-                                        <th>การดำเนินการ</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="pendingPlotsTable">
-                                    <!-- Data will be populated by JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Reports Tab Content -->
-        <div id="reportsTab" class="tab-content" style="display: none;">
-            <div class="row mb-4">
-                <div class="col-12 mb-3">
                     <div class="chart-card">
                         <h5 class="chart-title">
-                            <i class="fas fa-file-alt me-2"></i>รายงานสรุป
+                            <i class="fas fa-calendar-alt me-2"></i>การวิเคราะห์ตามช่วงเวลา
                         </h5>
                         <div class="row">
-                            <div class="col-lg-4 mb-3">
-                                <div class="quick-action-btn" id="exportSummaryReport">
-                                    <div class="quick-action-icon">
-                                        <i class="fas fa-file-pdf"></i>
-                                    </div>
-                                    <div class="quick-action-label">รายงานสรุป PDF</div>
-                                    <p class="small text-muted mt-2">สรุปข้อมูลทั้งหมดในรูปแบบ PDF</p>
+                            <div class="col-md-4 mb-3">
+                                <div class="p-3 text-center" style="background: #f8f9fa; border-radius: 8px;">
+                                    <div class="fs-3 fw-bold" id="monthlyTarget">0</div>
+                                    <div class="text-muted">เป้าหมายรายเดือน</div>
                                 </div>
                             </div>
-                            <div class="col-lg-4 mb-3">
-                                <div class="quick-action-btn" id="exportDetailedReport">
-                                    <div class="quick-action-icon">
-                                        <i class="fas fa-file-excel"></i>
-                                    </div>
-                                    <div class="quick-action-label">รายละเอียด Excel</div>
-                                    <p class="small text-muted mt-2">ข้อมูลทั้งหมดในรูปแบบ Excel</p>
+                            <div class="col-md-4 mb-3">
+                                <div class="p-3 text-center" style="background: #f8f9fa; border-radius: 8px;">
+                                    <div class="fs-3 fw-bold" id="monthlyActual">0</div>
+                                    <div class="text-muted">ดำเนินการได้จริง</div>
                                 </div>
                             </div>
-                            <div class="col-lg-4 mb-3">
-                                <div class="quick-action-btn" id="exportCustomReport">
-                                    <div class="quick-action-icon">
-                                        <i class="fas fa-cogs"></i>
-                                    </div>
-                                    <div class="quick-action-label">รายงานกำหนดเอง</div>
-                                    <p class="small text-muted mt-2">สร้างรายงานตามที่กำหนด</p>
+                            <div class="col-md-4 mb-3">
+                                <div class="p-3 text-center" style="background: #f8f9fa; border-radius: 8px;">
+                                    <div class="fs-3 fw-bold" id="monthlyGap">0</div>
+                                    <div class="text-muted">ส่วนต่างที่ต้องดำเนินการ</div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-lg-6 mb-3">
-                    <div class="data-card">
-                        <h5><i class="fas fa-chart-bar me-2"></i>ตัวชี้วัดประสิทธิภาพ</h5>
-                        <div id="performanceIndicators">
-                            <!-- Data will be populated by JavaScript -->
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-lg-6 mb-3">
-                    <div class="data-card">
-                        <h5><i class="fas fa-calendar-alt me-2"></i>รายงานประจำเดือน</h5>
-                        <div class="mb-3">
-                            <label class="form-label">เลือกเดือน</label>
-                            <select class="form-select" id="monthSelect">
-                                <option value="all">ทั้งหมด</option>
-                                <option value="1">มกราคม</option>
-                                <option value="2">กุมภาพันธ์</option>
-                                <option value="3">มีนาคม</option>
-                                <option value="4">เมษายน</option>
-                                <option value="5">พฤษภาคม</option>
-                                <option value="6">มิถุนายน</option>
-                                <option value="7">กรกฎาคม</option>
-                                <option value="8">สิงหาคม</option>
-                                <option value="9">กันยายน</option>
-                                <option value="10">ตุลาคม</option>
-                                <option value="11">พฤศจิกายน</option>
-                                <option value="12">ธันวาคม</option>
-                            </select>
-                        </div>
-                        <button class="btn btn-primary w-100" id="generateMonthlyReport">
-                            <i class="fas fa-download me-1"></i> สร้างรายงานประจำเดือน
-                        </button>
                     </div>
                 </div>
             </div>
@@ -847,21 +754,22 @@
             <div class="row">
                 <div class="col-md-6">
                     <h6><i class="fas fa-tachometer-alt me-1"></i> Dashboard โครงการผ่ากอ</h6>
-                    <p>ระบบติดตามและวิเคราะห์ข้อมูลแปลงเกษตร | เวอร์ชัน 1.0</p>
+                    <p>ระบบติดตามและวิเคราะห์ข้อมูลจาก 2 แหล่งข้อมูล | Google Sheet ID: 15eCkphn1ZCWJu1fg3ppe3Os-bKxAb4alvC33mAEgGrw</p>
                     <div class="mt-2">
-                        <i class="fas fa-database me-1"></i> Google Sheet ID: 15eCkphn1ZCWJu1fg3ppe3Os-bKxAb4alvC33mAEgGrw
+                        <span class="badge bg-primary me-2">ชีท Data: สมัครแล้ว</span>
+                        <span class="badge bg-success">ชีท สถานะ: ดำเนินการแล้ว</span>
                     </div>
                 </div>
                 <div class="col-md-6 text-md-end">
                     <p>
                         <i class="fas fa-clock me-1"></i> อัพเดตล่าสุด: <span id="dataUpdateTime">-</span><br>
-                        <i class="fas fa-code me-1"></i> พัฒนาด้วย Bootstrap 5, Chart.js
+                        <i class="fas fa-code me-1"></i> พัฒนาด้วย Bootstrap 5, Chart.js, PapaParse
                     </p>
                 </div>
             </div>
             <div class="text-center mt-3">
                 <p class="mb-0 text-muted">
-                    © 2026 โครงการผ่ากอ | ระบบ Dashboard
+                    © 2026 โครงการผ่ากอ | ระบบ Dashboard แบบครบวงจร
                 </p>
             </div>
         </footer>
@@ -871,75 +779,69 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <!-- Date Range Picker -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     
     <!-- Main Dashboard JavaScript -->
     <script>
         // Configuration
         const CONFIG = {
             SHEET_ID: '15eCkphn1ZCWJu1fg3ppe3Os-bKxAb4alvC33mAEgGrw',
-            SHEET_NAME: 'สถานะ',
-            DATA_URLS: [
-                'https://docs.google.com/spreadsheets/d/e/2PACX-1vTHlqFXL5N8DKNhyg8au_M9eypFk65rXRgXdCna7pO9gadqpHLmtcz8FHKeCaBlxuqGcIY60PxUhyu-/pub?gid=980262450&single=true&output=csv',
-                'https://opensheet.elk.sh/15eCkphn1ZCWJu1fg3ppe3Os-bKxAb4alvC33mAEgGrw/สถานะ'
-            ],
-            CACHE_DURATION: 10 * 60 * 1000, // 10 minutes
+            DATA_SHEET_NAME: 'Data',
+            STATUS_SHEET_NAME: 'สถานะ',
+            
+            // URLs for data fetching
+            DATA_URLS: {
+                data: [
+                    'https://docs.google.com/spreadsheets/d/e/2PACX-1vTHlqFXL5N8DKNhyg8au_M9eypFk65rXRgXdCna7pO9gadqpHLmtcz8FHKeCaBlxuqGcIY60PxUhyu-/pub?gid=980262450&single=true&output=csv',
+                    'https://opensheet.elk.sh/15eCkphn1ZCWJu1fg3ppe3Os-bKxAb4alvC33mAEgGrw/Data'
+                ],
+                status: [
+                    'https://docs.google.com/spreadsheets/d/e/2PACX-1vTHlqFXL5N8DKNhyg8au_M9eypFk65rXRgXdCna7pO9gadqpHLmtcz8FHKeCaBlxuqGcIY60PxUhyu-/pub?gid=980262450&single=true&output=csv',
+                    'https://opensheet.elk.sh/15eCkphn1ZCWJu1fg3ppe3Os-bKxAb4alvC33mAEgGrw/สถานะ'
+                ]
+            },
+            
+            // Column mappings for each sheet
             COLUMNS: {
-                PLOT_NUMBER: ['เลขแปลงและยกั', 'เลขโครงขา้', 'ชื่อราคาไฟ'],
-                FARMER: ['ชื่อมโยงเกษตร', 'เกษตรกร'],
-                ZONE: ['เขต', 'พื้นที่'],
-                VARIETY: ['พันธุ์', 'พันธุ์อ้อย'],
-                DATE: ['วันที่รอ้ มปลอด', 'วันที่ดำเนินการ', 'วันที่'],
-                IMAGE: ['รูปถ่ายตอนผ่ากอ', 'รูปภาพผ่ากอ', 'ภาพผ่ากอ']
-            }
+                data: {
+                    PLOT_NUMBER: ['เลขแปลง', 'เลขแปลงและยกั', 'เลขโครงขา้', 'ชื่อราคาไฟ'],
+                    FARMER: ['ชื่อมโยงเกษตร', 'เกษตรกร', 'ชื่อ-สกุล'],
+                    ZONE: ['เขต', 'พื้นที่', 'อำเภอ', 'จังหวัด'],
+                    VARIETY: ['พันธุ์', 'พันธุ์อ้อย'],
+                    AREA: ['พื้นที่', 'ขนาดพื้นที่', 'ไร่'],
+                    DATE: ['วันที่สมัคร', 'วันที่', 'วันที่บันทึก']
+                },
+                status: {
+                    PLOT_NUMBER: ['เลขแปลงและยกั', 'เลขโครงขา้', 'ชื่อราคาไฟ'],
+                    FARMER: ['ชื่อมโยงเกษตร', 'เกษตรกร'],
+                    ZONE: ['เขต', 'พื้นที่'],
+                    VARIETY: ['พันธุ์', 'พันธุ์อ้อย'],
+                    DATE: ['วันที่รอ้ มปลอด', 'วันที่ดำเนินการ'],
+                    IMAGE: ['รูปถ่ายตอนผ่ากอ', 'รูปภาพผ่ากอ', 'ภาพผ่ากอ'],
+                    NOTE: ['หมายเหตุ', 'บันทึกเพิ่มเติม']
+                }
+            },
+            
+            CACHE_DURATION: 10 * 60 * 1000 // 10 minutes
         };
 
         // Global variables
-        let allData = [];
-        let filteredData = [];
+        let dataSheetData = [];
+        let statusSheetData = [];
+        let mergedData = [];
         let currentTab = 'overview';
         let charts = {};
-        let filters = {
-            dateRange: null,
-            zone: '',
-            variety: '',
-            status: ''
-        };
 
         // Initialize when page loads
         $(document).ready(function() {
-            console.log('📊 เริ่มต้น Dashboard โครงการผ่ากอ');
+            console.log('📊 เริ่มต้น Dashboard โครงการผ่ากอ (2 ชีท)');
             
-            initializeDateRangePicker();
             initializeEventListeners();
-            loadDashboardData();
+            loadAllData();
             
             // Update timestamp
             updateTimestamps();
-            setInterval(updateTimestamps, 60000); // Update every minute
+            setInterval(updateTimestamps, 60000);
         });
-
-        function initializeDateRangePicker() {
-            $('#dateRangePicker').daterangepicker({
-                opens: 'left',
-                locale: {
-                    format: 'DD/MM/YYYY',
-                    applyLabel: 'ตกลง',
-                    cancelLabel: 'ยกเลิก',
-                    customRangeLabel: 'กำหนดเอง',
-                    daysOfWeek: ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'],
-                    monthNames: ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 
-                                 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม']
-                }
-            }, function(start, end) {
-                filters.dateRange = {
-                    start: start.format('YYYY-MM-DD'),
-                    end: end.format('YYYY-MM-DD')
-                };
-            });
-        }
 
         function initializeEventListeners() {
             // Tab navigation
@@ -949,13 +851,9 @@
                 switchTab(tabId);
             });
             
-            // Filter buttons
-            $('#applyFilterBtn').click(applyFilters);
-            $('#resetFilterBtn').click(resetFilters);
-            
             // Refresh data
             $('#refreshDataBtn').click(function() {
-                loadDashboardData(true);
+                loadAllData(true);
                 $(this).html('<i class="fas fa-spinner fa-spin me-1"></i> กำลังรีเฟรช...');
                 setTimeout(() => {
                     $(this).html('<i class="fas fa-sync-alt me-1"></i> รีเฟรชข้อมูล');
@@ -964,15 +862,13 @@
             
             // Go to search page
             $('#goToSearchBtn').click(function() {
-                window.location.href = 'index.html'; // เปลี่ยนเป็น path ที่ถูกต้อง
+                // Assuming search page is in same directory
+                window.location.href = 'index.html';
             });
             
-            // Quick actions
-            $('#exportSummaryReport').click(exportSummaryReport);
-            $('#exportDetailedReport').click(exportDetailedReport);
-            $('#exportCustomReport').click(exportCustomReport);
-            $('#generateMonthlyReport').click(generateMonthlyReport);
-            $('#loadMapBtn').click(loadMap);
+            // Export buttons
+            $('#exportPendingBtn').click(exportPendingData);
+            $('#exportCompletedBtn').click(exportCompletedData);
         }
 
         function switchTab(tabId) {
@@ -986,43 +882,75 @@
             // Show selected tab content
             $(`#${tabId}Tab`).show();
             
-            // Update charts for the tab
+            // Update content for the tab
             currentTab = tabId;
-            updateChartsForTab(tabId);
+            updateTabContent(tabId);
         }
 
-        function loadDashboardData(forceRefresh = false) {
-            showLoading(true);
+        function loadAllData(forceRefresh = false) {
+            showLoading(true, 'กำลังโหลดข้อมูลจากชีท Data...');
+            
+            // Clear cache if force refresh
+            if (forceRefresh) {
+                clearCache();
+            }
+            
+            // Load Data sheet first
+            loadDataSheet(forceRefresh);
+        }
+
+        function loadDataSheet(forceRefresh = false) {
+            updateLoadingProgress(25, 'กำลังโหลดข้อมูลจากชีท Data...');
             
             // Check cache first
             if (!forceRefresh) {
-                const cachedData = getCachedData();
+                const cachedData = getCachedData('dataSheet');
                 if (cachedData) {
-                    allData = cachedData;
-                    processDashboardData();
+                    dataSheetData = cachedData;
+                    loadStatusSheet();
                     return;
                 }
             }
             
-            // Load from Google Sheet
-            loadDataFromSheet();
+            // Load from URL
+            loadSheetData('data', CONFIG.DATA_URLS.data, function(data) {
+                dataSheetData = data;
+                cacheData('dataSheet', data);
+                loadStatusSheet();
+            });
         }
 
-        function loadDataFromSheet() {
-            console.log('📥 กำลังโหลดข้อมูลจาก Google Sheet...');
+        function loadStatusSheet() {
+            updateLoadingProgress(50, 'กำลังโหลดข้อมูลจากชีท สถานะ...');
             
-            // Try multiple URLs
-            tryLoadData(0);
-        }
-
-        function tryLoadData(index) {
-            if (index >= CONFIG.DATA_URLS.length) {
-                showError('ไม่สามารถโหลดข้อมูลได้');
-                showLoading(false);
+            // Check cache first
+            const cachedData = getCachedData('statusSheet');
+            if (cachedData) {
+                statusSheetData = cachedData;
+                processMergedData();
                 return;
             }
             
-            const url = CONFIG.DATA_URLS[index];
+            // Load from URL
+            loadSheetData('status', CONFIG.DATA_URLS.status, function(data) {
+                statusSheetData = data;
+                cacheData('statusSheet', data);
+                processMergedData();
+            });
+        }
+
+        function loadSheetData(sheetType, urls, callback) {
+            tryLoadSheetData(sheetType, urls, 0, callback);
+        }
+
+        function tryLoadSheetData(sheetType, urls, index, callback) {
+            if (index >= urls.length) {
+                console.error(`❌ ไม่สามารถโหลดข้อมูลจากชีท ${sheetType} ได้`);
+                callback([]);
+                return;
+            }
+            
+            const url = urls[index];
             
             if (url.includes('opensheet.elk.sh')) {
                 // JSON format
@@ -1032,11 +960,12 @@
                     dataType: 'json',
                     timeout: 15000,
                     success: function(data) {
-                        handleDataSuccess(data, 'JSON');
+                        console.log(`✅ โหลด ${sheetType} สำเร็จ (JSON): ${data.length} รายการ`);
+                        callback(data);
                     },
                     error: function(xhr, status, error) {
-                        console.error(`❌ JSON ล้มเหลว:`, error);
-                        tryLoadData(index + 1);
+                        console.error(`❌ ${sheetType} JSON ล้มเหลว:`, error);
+                        tryLoadSheetData(sheetType, urls, index + 1, callback);
                     }
                 });
             } else {
@@ -1048,176 +977,165 @@
                     encoding: 'UTF-8',
                     complete: function(results) {
                         if (results.data && results.data.length > 0) {
-                            handleDataSuccess(results.data, 'CSV');
+                            console.log(`✅ โหลด ${sheetType} สำเร็จ (CSV): ${results.data.length} รายการ`);
+                            callback(results.data);
                         } else {
-                            console.log(`❌ CSV ไม่มีข้อมูล`);
-                            tryLoadData(index + 1);
+                            console.log(`❌ ${sheetType} CSV ไม่มีข้อมูล`);
+                            tryLoadSheetData(sheetType, urls, index + 1, callback);
                         }
                     },
                     error: function(error) {
-                        console.error(`❌ CSV ล้มเหลว:`, error);
-                        tryLoadData(index + 1);
+                        console.error(`❌ ${sheetType} CSV ล้มเหลว:`, error);
+                        tryLoadSheetData(sheetType, urls, index + 1, callback);
                     }
                 });
             }
         }
 
-        function handleDataSuccess(data, source) {
-            console.log(`✅ โหลดข้อมูลสำเร็จ (${source}): ${data.length} รายการ`);
+        function processMergedData() {
+            updateLoadingProgress(75, 'กำลังประมวลผลข้อมูล...');
             
-            allData = data;
-            filteredData = [...data];
-            
-            // Cache data
-            cacheData(data);
-            
-            // Process data
-            processDashboardData();
-            
-            // Update UI
-            updateTimestamps();
-            showSuccess(`โหลดข้อมูลสำเร็จ ${data.length} รายการ`);
-        }
-
-        function processDashboardData() {
-            // Update filter dropdowns
-            updateFilterOptions();
+            // Merge and analyze data
+            mergedData = mergeAndAnalyzeData();
             
             // Calculate statistics
             calculateStatistics();
             
-            // Update charts
+            // Update UI
             updateAllCharts();
+            updateTables();
+            updateTimestamps();
             
-            // Update tables
-            updateRecentActivityTable();
-            updateZoneSummaryTable();
-            updatePendingPlotsTable();
+            updateLoadingProgress(100, 'โหลดข้อมูลสำเร็จ!');
             
-            showLoading(false);
+            setTimeout(() => {
+                showLoading(false);
+                showSuccess(`โหลดข้อมูลสำเร็จ! (Data: ${dataSheetData.length} รายการ, สถานะ: ${statusSheetData.length} รายการ)`);
+            }, 500);
+        }
+
+        function mergeAndAnalyzeData() {
+            // Create a merged dataset for analysis
+            const merged = [];
+            
+            // Add data from Data sheet
+            dataSheetData.forEach((row, index) => {
+                merged.push({
+                    ...row,
+                    _source: 'data',
+                    _index: index,
+                    _status: 'pending',
+                    _matched: false
+                });
+            });
+            
+            // Add data from Status sheet and try to match
+            statusSheetData.forEach((row, index) => {
+                // Try to find matching plot in data sheet
+                const plotNumber = getColumnValue(row, CONFIG.COLUMNS.status.PLOT_NUMBER);
+                let matched = false;
+                
+                if (plotNumber) {
+                    for (let i = 0; i < merged.length; i++) {
+                        const dataPlotNumber = getColumnValue(merged[i], CONFIG.COLUMNS.data.PLOT_NUMBER);
+                        if (dataPlotNumber && dataPlotNumber === plotNumber) {
+                            merged[i]._matched = true;
+                            merged[i]._status = 'completed';
+                            merged[i]._statusData = row;
+                            matched = true;
+                            break;
+                        }
+                    }
+                }
+                
+                // If not matched, add as new completed entry
+                if (!matched) {
+                    merged.push({
+                        ...row,
+                        _source: 'status',
+                        _index: index,
+                        _status: 'completed',
+                        _matched: false,
+                        _statusData: row
+                    });
+                }
+            });
+            
+            return merged;
         }
 
         function calculateStatistics() {
-            const totalPlots = filteredData.length;
+            // Basic counts
+            const totalData = dataSheetData.length;
+            const totalStatus = statusSheetData.length;
             
-            // Count completed plots (has date and image)
-            const completedPlots = filteredData.filter(row => {
-                const hasDate = CONFIG.COLUMNS.DATE.some(col => row[col] && row[col].trim() !== '');
-                const hasImage = CONFIG.COLUMNS.IMAGE.some(col => row[col] && row[col].trim() !== '');
-                return hasDate && hasImage;
-            }).length;
+            // Find matched plots (plots that exist in both sheets)
+            const matchedPlots = mergedData.filter(item => item._matched).length;
             
-            // Count pending plots
-            const pendingPlots = filteredData.filter(row => {
-                const hasDate = CONFIG.COLUMNS.DATE.some(col => row[col] && row[col].trim() !== '');
-                return !hasDate;
-            }).length;
+            // Find unique to each sheet
+            const uniqueToData = mergedData.filter(item => 
+                item._source === 'data' && !item._matched).length;
+            const uniqueToStatus = mergedData.filter(item => 
+                item._source === 'status' && !item._matched).length;
             
-            // Count unique farmers
-            const farmers = new Set();
-            filteredData.forEach(row => {
-                CONFIG.COLUMNS.FARMER.forEach(col => {
-                    if (row[col] && row[col].trim() !== '') {
-                        farmers.add(row[col].trim());
-                    }
-                });
+            // Calculate completion rate
+            const completionRate = totalData > 0 ? 
+                Math.round((matchedPlots / totalData) * 100) : 0;
+            
+            // Calculate remaining plots
+            const remainingPlots = totalData - matchedPlots;
+            
+            // Update display
+            $('#totalDataPlots').text(totalData.toLocaleString());
+            $('#totalStatusPlots').text(totalStatus.toLocaleString());
+            $('#completionRate').text(`${completionRate}%`);
+            $('#remainingPlots').text(remainingPlots.toLocaleString());
+            $('#duplicatePlots').text(matchedPlots.toLocaleString());
+            $('#uniquePlots').text((uniqueToData + uniqueToStatus).toLocaleString());
+            
+            // Calculate farmers
+            const dataFarmers = countUniqueValues(dataSheetData, CONFIG.COLUMNS.data.FARMER);
+            const statusFarmers = countUniqueValues(statusSheetData, CONFIG.COLUMNS.status.FARMER);
+            $('#totalDataFarmers').text(dataFarmers);
+            $('#totalStatusFarmers').text(statusFarmers);
+            
+            // Calculate varieties and zones
+            const totalVarieties = new Set();
+            const totalZones = new Set();
+            
+            mergedData.forEach(item => {
+                const variety = getColumnValue(item, 
+                    item._source === 'data' ? 
+                    CONFIG.COLUMNS.data.VARIETY : 
+                    CONFIG.COLUMNS.status.VARIETY);
+                const zone = getColumnValue(item,
+                    item._source === 'data' ?
+                    CONFIG.COLUMNS.data.ZONE :
+                    CONFIG.COLUMNS.status.ZONE);
+                
+                if (variety) totalVarieties.add(variety);
+                if (zone) totalZones.add(zone);
             });
             
-            // Urgent plots (based on date)
-            const urgentPlots = filteredData.filter(row => {
-                const dateCol = CONFIG.COLUMNS.DATE.find(col => row[col]);
-                if (!dateCol || !row[dateCol]) return false;
-                
-                // Parse date (assuming DD/MM/YYYY format)
-                const dateParts = row[dateCol].split('/');
-                if (dateParts.length !== 3) return false;
-                
-                const plotDate = new Date(parseInt(dateParts[2]), parseInt(dateParts[1]) - 1, parseInt(dateParts[0]));
-                const today = new Date();
-                const diffTime = plotDate - today;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                
-                return diffDays <= 7 && diffDays >= 0; // Due within 7 days
-            }).length;
+            $('#totalVarieties').text(totalVarieties.size);
+            $('#totalZones').text(totalZones.size);
             
-            // Missing images
-            const missingImages = filteredData.filter(row => {
-                return !CONFIG.COLUMNS.IMAGE.some(col => row[col] && row[col].trim() !== '');
-            }).length;
+            // Update progress bar
+            const progressPercentage = totalData > 0 ? 
+                Math.round((matchedPlots / totalData) * 100) : 0;
+            $('#progressPercentage').text(`${progressPercentage}%`);
+            $('#progressBar').css('width', `${progressPercentage}%`);
             
-            // Missing plot numbers
-            const missingPlotNumbers = filteredData.filter(row => {
-                return !CONFIG.COLUMNS.PLOT_NUMBER.some(col => row[col] && row[col].trim() !== '');
-            }).length;
+            // Set target (assume target is 20% more than current data)
+            const targetPlots = Math.round(totalData * 1.2);
+            $('#targetPlots').text(targetPlots.toLocaleString());
+            $('#achievementRate').text(`${Math.round((totalStatus / targetPlots) * 100)}%`);
             
-            // Recent completed (last 7 days)
-            const recentCompleted = filteredData.filter(row => {
-                const dateCol = CONFIG.COLUMNS.DATE.find(col => row[col]);
-                if (!dateCol || !row[dateCol]) return false;
-                
-                const dateParts = row[dateCol].split('/');
-                if (dateParts.length !== 3) return false;
-                
-                const plotDate = new Date(parseInt(dateParts[2]), parseInt(dateParts[1]) - 1, parseInt(dateParts[0]));
-                const today = new Date();
-                const diffTime = today - plotDate;
-                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                
-                return diffDays <= 7;
-            }).length;
-            
-            // Update statistics display
-            $('#totalPlots').text(totalPlots.toLocaleString());
-            $('#completedPlots').text(completedPlots.toLocaleString());
-            $('#completedPercentage').text(`${Math.round((completedPlots / totalPlots) * 100)}%`);
-            $('#pendingPlots').text(pendingPlots.toLocaleString());
-            $('#pendingPercentage').text(`${Math.round((pendingPlots / totalPlots) * 100)}%`);
-            $('#totalFarmers').text(farmers.size.toLocaleString());
-            $('#urgentPlots').text(urgentPlots);
-            $('#missingImages').text(missingImages);
-            $('#missingPlotNumbers').text(missingPlotNumbers);
-            $('#recentCompleted').text(recentCompleted);
-            $('#completionRate').text(`${Math.round((completedPlots / totalPlots) * 100)}%`);
-            $('#plotsPerFarmer').text(farmers.size > 0 ? (totalPlots / farmers.size).toFixed(1) : '0');
-            $('#plotsWithImages').text(`${Math.round(((totalPlots - missingImages) / totalPlots) * 100)}%`);
-            
-            // Status counts
-            $('#statusCompleted').text(completedPlots);
-            $('#statusPending').text(pendingPlots);
-            $('#statusInProgress').text(totalPlots - completedPlots - pendingPlots);
-            $('#statusUnknown').text(0);
-        }
-
-        function updateFilterOptions() {
-            // Zones
-            const zones = new Set();
-            filteredData.forEach(row => {
-                CONFIG.COLUMNS.ZONE.forEach(col => {
-                    if (row[col] && row[col].trim() !== '') {
-                        zones.add(row[col].trim());
-                    }
-                });
-            });
-            
-            $('#zoneFilter').empty().append('<option value="">ทั้งหมด</option>');
-            zones.forEach(zone => {
-                $('#zoneFilter').append(`<option value="${zone}">${zone}</option>`);
-            });
-            
-            // Varieties
-            const varieties = new Set();
-            filteredData.forEach(row => {
-                CONFIG.COLUMNS.VARIETY.forEach(col => {
-                    if (row[col] && row[col].trim() !== '') {
-                        varieties.add(row[col].trim());
-                    }
-                });
-            });
-            
-            $('#varietyFilter').empty().append('<option value="">ทั้งหมด</option>');
-            varieties.forEach(variety => {
-                $('#varietyFilter').append(`<option value="${variety}">${variety}</option>`);
-            });
+            // Update counts for tables
+            $('#pendingCount').text(Math.min(20, uniqueToData));
+            $('#totalPending').text(uniqueToData);
+            $('#completedCount').text(Math.min(20, totalStatus));
+            $('#totalCompleted').text(totalStatus);
         }
 
         function updateAllCharts() {
@@ -1230,122 +1148,62 @@
             
             // Create charts based on current tab
             if (currentTab === 'overview') {
-                createZoneChart();
-                createVarietyChart();
-                createMonthlyChart();
-            } else if (currentTab === 'analysis') {
+                createOverallStatusChart();
+                createZoneComparisonChart();
+            } else if (currentTab === 'comparison') {
                 createTrendChart();
-                createProgressChart();
-                createDistributionChart();
-            } else if (currentTab === 'status') {
-                createStatusChart();
+                createEfficiencyChart();
+                updateZoneComparisonTable();
+            } else if (currentTab === 'analysis') {
+                createAnalysisChart();
+                updateAnalysisMetrics();
             }
         }
 
-        function updateChartsForTab(tabId) {
-            if (tabId === 'overview') {
-                if (!charts.zoneChart) createZoneChart();
-                if (!charts.varietyChart) createVarietyChart();
-                if (!charts.monthlyChart) createMonthlyChart();
+        function updateTabContent(tabId) {
+            if (tabId === 'pending') {
+                updatePendingTable();
+            } else if (tabId === 'completed') {
+                updateCompletedTable();
+            } else if (tabId === 'comparison') {
+                updateZoneComparisonTable();
             } else if (tabId === 'analysis') {
-                if (!charts.trendChart) createTrendChart();
-                if (!charts.progressChart) createProgressChart();
-                if (!charts.distributionChart) createDistributionChart();
-            } else if (tabId === 'status') {
-                if (!charts.statusChart) createStatusChart();
+                updateAnalysisMetrics();
             }
         }
 
-        function createZoneChart() {
-            const ctx = document.getElementById('zoneChart').getContext('2d');
-            
-            // Group data by zone
-            const zoneData = {};
-            filteredData.forEach(row => {
-                let zone = 'ไม่ระบุ';
-                CONFIG.COLUMNS.ZONE.forEach(col => {
-                    if (row[col] && row[col].trim() !== '') {
-                        zone = row[col].trim();
-                    }
-                });
-                
-                if (!zoneData[zone]) zoneData[zone] = 0;
-                zoneData[zone]++;
-            });
-            
-            const labels = Object.keys(zoneData);
-            const data = Object.values(zoneData);
-            
-            charts.zoneChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'จำนวนแปลง',
-                        data: data,
-                        backgroundColor: [
-                            '#1a73e8', '#34a853', '#fbbc05', '#ea4335', '#17a2b8',
-                            '#6f42c1', '#fd7e14', '#20c997', '#e83e8c', '#6c757d'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'จำนวนแปลง'
-                            }
-                        }
-                    }
-                }
-            });
+        function updateTables() {
+            updatePendingTable();
+            updateCompletedTable();
+            updateZoneComparisonTable();
+            updateAnalysisMetrics();
         }
 
-        function createVarietyChart() {
-            const ctx = document.getElementById('varietyChart').getContext('2d');
+        function createOverallStatusChart() {
+            const ctx = document.getElementById('overallStatusChart').getContext('2d');
             
-            // Group data by variety
-            const varietyData = {};
-            filteredData.forEach(row => {
-                let variety = 'ไม่ระบุ';
-                CONFIG.COLUMNS.VARIETY.forEach(col => {
-                    if (row[col] && row[col].trim() !== '') {
-                        variety = row[col].trim();
-                    }
-                });
-                
-                if (!varietyData[variety]) varietyData[variety] = 0;
-                varietyData[variety]++;
-            });
+            const totalData = dataSheetData.length;
+            const totalStatus = statusSheetData.length;
+            const matched = mergedData.filter(item => item._matched).length;
+            const uniqueData = mergedData.filter(item => 
+                item._source === 'data' && !item._matched).length;
+            const uniqueStatus = mergedData.filter(item => 
+                item._source === 'status' && !item._matched).length;
             
-            // Sort and get top 10
-            const sortedVarieties = Object.entries(varietyData)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 10);
-            
-            const labels = sortedVarieties.map(v => v[0]);
-            const data = sortedVarieties.map(v => v[1]);
-            
-            charts.varietyChart = new Chart(ctx, {
+            charts.overallStatusChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: labels,
+                    labels: [
+                        'สมัครแล้ว (รอดำเนินการ)',
+                        'ดำเนินการแล้ว (จากสมัคร)',
+                        'ดำเนินการแล้ว (เพิ่มเติม)'
+                    ],
                     datasets: [{
-                        label: 'จำนวนแปลง',
-                        data: data,
+                        data: [uniqueData, matched, uniqueStatus],
                         backgroundColor: [
-                            '#1a73e8', '#34a853', '#fbbc05', '#ea4335', '#17a2b8',
-                            '#6f42c1', '#fd7e14', '#20c997', '#e83e8c', '#6c757d'
+                            '#6f42c1', // Data sheet color
+                            '#34a853', // Matched
+                            '#28a745'  // Status only
                         ],
                         borderWidth: 1
                     }]
@@ -1356,93 +1214,95 @@
                     plugins: {
                         legend: {
                             position: 'right'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = uniqueData + matched + uniqueStatus;
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
                         }
                     }
                 }
             });
         }
 
-        function createMonthlyChart() {
-            const ctx = document.getElementById('monthlyChart').getContext('2d');
+        function createZoneComparisonChart() {
+            const ctx = document.getElementById('zoneComparisonChart').getContext('2d');
             
-            // Group data by month
-            const monthlyData = new Array(12).fill(0);
-            filteredData.forEach(row => {
-                const dateCol = CONFIG.COLUMNS.DATE.find(col => row[col]);
-                if (!dateCol || !row[dateCol]) return;
-                
-                const dateParts = row[dateCol].split('/');
-                if (dateParts.length !== 3) return;
-                
-                const month = parseInt(dateParts[1]) - 1; // 0-based
-                if (month >= 0 && month < 12) {
-                    monthlyData[month]++;
+            // Group data by zone
+            const zoneStats = {};
+            
+            // Process Data sheet
+            dataSheetData.forEach(row => {
+                const zone = getColumnValue(row, CONFIG.COLUMNS.data.ZONE) || 'ไม่ระบุ';
+                if (!zoneStats[zone]) {
+                    zoneStats[zone] = { data: 0, status: 0, completed: 0 };
                 }
+                zoneStats[zone].data++;
             });
             
-            const monthNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 
-                               'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-            
-            charts.monthlyChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: monthNames,
-                    datasets: [{
-                        label: 'จำนวนแปลง',
-                        data: monthlyData,
-                        borderColor: '#1a73e8',
-                        backgroundColor: 'rgba(26, 115, 232, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
+            // Process Status sheet and find matches
+            statusSheetData.forEach(row => {
+                const zone = getColumnValue(row, CONFIG.COLUMNS.status.ZONE) || 'ไม่ระบุ';
+                if (!zoneStats[zone]) {
+                    zoneStats[zone] = { data: 0, status: 0, completed: 0 };
+                }
+                zoneStats[zone].status++;
+                
+                // Check if this plot exists in data sheet
+                const plotNumber = getColumnValue(row, CONFIG.COLUMNS.status.PLOT_NUMBER);
+                if (plotNumber) {
+                    const existsInData = dataSheetData.some(dataRow => {
+                        const dataPlotNumber = getColumnValue(dataRow, CONFIG.COLUMNS.data.PLOT_NUMBER);
+                        return dataPlotNumber === plotNumber;
+                    });
+                    
+                    if (existsInData) {
+                        zoneStats[zone].completed++;
                     }
                 }
             });
-        }
-
-        function createTrendChart() {
-            const ctx = document.getElementById('trendChart').getContext('2d');
             
-            // Simulate trend data
-            const labels = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 
-                           'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-            const completed = [5, 8, 12, 15, 20, 25, 30, 35, 40, 45, 50, 55];
-            const pending = [100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45];
+            // Get top 8 zones by total plots
+            const sortedZones = Object.entries(zoneStats)
+                .sort((a, b) => (b[1].data + b[1].status) - (a[1].data + a[1].status))
+                .slice(0, 8);
             
-            charts.trendChart = new Chart(ctx, {
-                type: 'line',
+            const labels = sortedZones.map(([zone]) => zone);
+            const dataData = sortedZones.map(([, stats]) => stats.data);
+            const statusData = sortedZones.map(([, stats]) => stats.status);
+            const completedData = sortedZones.map(([, stats]) => stats.completed);
+            
+            charts.zoneComparisonChart = new Chart(ctx, {
+                type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [
                         {
-                            label: 'ดำเนินการแล้ว',
-                            data: completed,
-                            borderColor: '#34a853',
-                            backgroundColor: 'rgba(52, 168, 83, 0.1)',
-                            borderWidth: 2,
-                            fill: true
+                            label: 'สมัคร (Data)',
+                            data: dataData,
+                            backgroundColor: 'rgba(111, 66, 193, 0.7)',
+                            borderColor: '#6f42c1',
+                            borderWidth: 1
                         },
                         {
-                            label: 'รอดำเนินการ',
-                            data: pending,
-                            borderColor: '#fbbc05',
-                            backgroundColor: 'rgba(251, 188, 5, 0.1)',
-                            borderWidth: 2,
-                            fill: true
+                            label: 'ดำเนินการแล้ว (สถานะ)',
+                            data: statusData,
+                            backgroundColor: 'rgba(52, 168, 83, 0.7)',
+                            borderColor: '#34a853',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'ดำเนินการแล้ว (จากสมัคร)',
+                            data: completedData,
+                            backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                            borderColor: '#28a745',
+                            borderWidth: 1
                         }
                     ]
                 },
@@ -1455,240 +1315,141 @@
                         }
                     },
                     scales: {
+                        x: {
+                            stacked: false
+                        },
                         y: {
                             beginAtZero: true,
                             title: {
                                 display: true,
                                 text: 'จำนวนแปลง'
-                            }
+                            },
+                            stacked: false
                         }
                     }
                 }
             });
         }
 
-        function createStatusChart() {
-            const ctx = document.getElementById('statusChart').getContext('2d');
-            
-            // Calculate status counts
-            const completed = filteredData.filter(row => {
-                const hasDate = CONFIG.COLUMNS.DATE.some(col => row[col] && row[col].trim() !== '');
-                const hasImage = CONFIG.COLUMNS.IMAGE.some(col => row[col] && row[col].trim() !== '');
-                return hasDate && hasImage;
-            }).length;
-            
-            const pending = filteredData.filter(row => {
-                const hasDate = CONFIG.COLUMNS.DATE.some(col => row[col] && row[col].trim() !== '');
-                return !hasDate;
-            }).length;
-            
-            const inProgress = filteredData.length - completed - pending;
-            
-            charts.statusChart = new Chart(ctx, {
-                type: 'polarArea',
-                data: {
-                    labels: ['ดำเนินการแล้ว', 'กำลังดำเนินการ', 'รอดำเนินการ'],
-                    datasets: [{
-                        label: 'จำนวนแปลง',
-                        data: [completed, inProgress, pending],
-                        backgroundColor: [
-                            'rgba(52, 168, 83, 0.7)',
-                            'rgba(26, 115, 232, 0.7)',
-                            'rgba(251, 188, 5, 0.7)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right'
-                        }
-                    }
-                }
-            });
-        }
-
-        function updateRecentActivityTable() {
-            const tbody = $('#recentActivityTable');
-            tbody.empty();
-            
-            // Get recent 10 rows
-            const recentData = filteredData.slice(0, 10);
-            
-            recentData.forEach((row, index) => {
-                const plotNumber = getColumnValue(row, CONFIG.COLUMNS.PLOT_NUMBER) || '-';
-                const farmer = getColumnValue(row, CONFIG.COLUMNS.FARMER) || '-';
-                const zone = getColumnValue(row, CONFIG.COLUMNS.ZONE) || '-';
-                const variety = getColumnValue(row, CONFIG.COLUMNS.VARIETY) || '-';
-                const date = getColumnValue(row, CONFIG.COLUMNS.DATE) || '-';
-                const hasImage = CONFIG.COLUMNS.IMAGE.some(col => row[col] && row[col].trim() !== '');
-                
-                // Determine status
-                let status = 'รอดำเนินการ';
-                let statusClass = 'status-pending';
-                
-                if (date !== '-') {
-                    if (hasImage) {
-                        status = 'ดำเนินการแล้ว';
-                        statusClass = 'status-completed';
-                    } else {
-                        status = 'กำลังดำเนินการ';
-                        statusClass = 'status-inprogress';
-                    }
-                }
-                
-                const tr = `
-                    <tr>
-                        <td>${plotNumber}</td>
-                        <td>${farmer}</td>
-                        <td>${zone}</td>
-                        <td>${variety}</td>
-                        <td>${date}</td>
-                        <td><span class="status-badge ${statusClass}">${status}</span></td>
-                        <td>
-                            ${hasImage ? 
-                                '<i class="fas fa-check text-success"></i>' : 
-                                '<i class="fas fa-times text-danger"></i>'}
-                        </td>
-                    </tr>
-                `;
-                
-                tbody.append(tr);
-            });
-            
-            if (recentData.length === 0) {
-                tbody.append(`
-                    <tr>
-                        <td colspan="7" class="text-center text-muted py-3">
-                            ไม่พบข้อมูล
-                        </td>
-                    </tr>
-                `);
-            }
-        }
-
-        function updateZoneSummaryTable() {
-            const tbody = $('#zoneSummaryTable');
+        function updateZoneComparisonTable() {
+            const tbody = $('#zoneComparisonTable');
             tbody.empty();
             
             // Group data by zone
-            const zoneSummary = {};
+            const zoneStats = {};
             
-            filteredData.forEach(row => {
-                let zone = 'ไม่ระบุ';
-                CONFIG.COLUMNS.ZONE.forEach(col => {
-                    if (row[col] && row[col].trim() !== '') {
-                        zone = row[col].trim();
-                    }
-                });
-                
-                if (!zoneSummary[zone]) {
-                    zoneSummary[zone] = {
-                        plots: 0,
-                        farmers: new Set(),
-                        completed: 0
+            // Process both sheets
+            dataSheetData.forEach(row => {
+                const zone = getColumnValue(row, CONFIG.COLUMNS.data.ZONE) || 'ไม่ระบุ';
+                if (!zoneStats[zone]) {
+                    zoneStats[zone] = {
+                        data: 0,
+                        status: 0,
+                        completed: 0,
+                        farmers: new Set()
                     };
                 }
-                
-                zoneSummary[zone].plots++;
+                zoneStats[zone].data++;
                 
                 // Add farmer
-                CONFIG.COLUMNS.FARMER.forEach(col => {
-                    if (row[col] && row[col].trim() !== '') {
-                        zoneSummary[zone].farmers.add(row[col].trim());
-                    }
-                });
+                const farmer = getColumnValue(row, CONFIG.COLUMNS.data.FARMER);
+                if (farmer) zoneStats[zone].farmers.add(farmer);
+            });
+            
+            statusSheetData.forEach(row => {
+                const zone = getColumnValue(row, CONFIG.COLUMNS.status.ZONE) || 'ไม่ระบุ';
+                if (!zoneStats[zone]) {
+                    zoneStats[zone] = {
+                        data: 0,
+                        status: 0,
+                        completed: 0,
+                        farmers: new Set()
+                    };
+                }
+                zoneStats[zone].status++;
                 
-                // Check if completed
-                const hasDate = CONFIG.COLUMNS.DATE.some(col => row[col] && row[col].trim() !== '');
-                const hasImage = CONFIG.COLUMNS.IMAGE.some(col => row[col] && row[col].trim() !== '');
-                if (hasDate && hasImage) {
-                    zoneSummary[zone].completed++;
+                // Add farmer
+                const farmer = getColumnValue(row, CONFIG.COLUMNS.status.FARMER);
+                if (farmer) zoneStats[zone].farmers.add(farmer);
+                
+                // Check if completed from data sheet
+                const plotNumber = getColumnValue(row, CONFIG.COLUMNS.status.PLOT_NUMBER);
+                if (plotNumber) {
+                    const existsInData = dataSheetData.some(dataRow => {
+                        const dataPlotNumber = getColumnValue(dataRow, CONFIG.COLUMNS.data.PLOT_NUMBER);
+                        return dataPlotNumber === plotNumber;
+                    });
+                    
+                    if (existsInData) {
+                        zoneStats[zone].completed++;
+                    }
                 }
             });
             
-            // Convert to array and sort by plot count
-            const sortedZones = Object.entries(zoneSummary)
-                .sort((a, b) => b[1].plots - a[1].plots)
-                .slice(0, 8);
+            // Sort by completion rate
+            const sortedZones = Object.entries(zoneStats)
+                .sort((a, b) => {
+                    const rateA = a[1].data > 0 ? (a[1].completed / a[1].data) : 0;
+                    const rateB = b[1].data > 0 ? (b[1].completed / b[1].data) : 0;
+                    return rateB - rateA;
+                });
             
-            sortedZones.forEach(([zone, data]) => {
-                const completionRate = data.plots > 0 ? 
-                    Math.round((data.completed / data.plots) * 100) : 0;
+            sortedZones.forEach(([zone, stats]) => {
+                const pending = stats.data - stats.completed;
+                const completionRate = stats.data > 0 ? 
+                    Math.round((stats.completed / stats.data) * 100) : 0;
+                
+                // Determine status color
+                let statusClass = 'text-danger';
+                if (completionRate >= 80) statusClass = 'text-success';
+                else if (completionRate >= 50) statusClass = 'text-warning';
                 
                 const tr = `
                     <tr>
                         <td>${zone}</td>
-                        <td>${data.plots}</td>
-                        <td>${data.farmers.size}</td>
-                        <td>${data.completed}</td>
-                        <td>
-                            <div class="progress" style="height: 8px;">
-                                <div class="progress-bar" role="progressbar" 
-                                     style="width: ${completionRate}%;" 
-                                     aria-valuenow="${completionRate}" 
-                                     aria-valuemin="0" 
-                                     aria-valuemax="100">
+                        <td class="text-center">${stats.data}</td>
+                        <td class="text-center">${stats.status}</td>
+                        <td class="text-center">${pending}</td>
+                        <td class="text-center">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <div class="progress" style="width: 100px; height: 20px;">
+                                    <div class="progress-bar" role="progressbar" 
+                                         style="width: ${completionRate}%; background-color: #6f42c1;">
+                                    </div>
                                 </div>
+                                <span class="ms-2 ${statusClass} fw-bold">${completionRate}%</span>
                             </div>
-                            <small>${completionRate}%</small>
+                        </td>
+                        <td class="text-center">
+                            ${completionRate >= 80 ? 
+                                '<span class="badge bg-success">ดีมาก</span>' :
+                              completionRate >= 50 ? 
+                                '<span class="badge bg-warning">ปานกลาง</span>' :
+                                '<span class="badge bg-danger">ต้องปรับปรุง</span>'}
                         </td>
                     </tr>
                 `;
                 
                 tbody.append(tr);
             });
-            
-            if (sortedZones.length === 0) {
-                tbody.append(`
-                    <tr>
-                        <td colspan="5" class="text-center text-muted py-3">
-                            ไม่พบข้อมูล
-                        </td>
-                    </tr>
-                `);
-            }
         }
 
-        function updatePendingPlotsTable() {
-            const tbody = $('#pendingPlotsTable');
+        function updatePendingTable() {
+            const tbody = $('#pendingTable');
             tbody.empty();
             
-            // Get pending plots
-            const pendingPlots = filteredData.filter(row => {
-                const hasDate = CONFIG.COLUMNS.DATE.some(col => row[col] && row[col].trim() !== '');
-                return !hasDate;
-            }).slice(0, 15); // Limit to 15 rows
+            // Get plots that are only in Data sheet (not matched)
+            const pendingPlots = mergedData
+                .filter(item => item._source === 'data' && !item._matched)
+                .slice(0, 20); // Show first 20
             
             pendingPlots.forEach((row, index) => {
-                const plotNumber = getColumnValue(row, CONFIG.COLUMNS.PLOT_NUMBER) || '-';
-                const farmer = getColumnValue(row, CONFIG.COLUMNS.FARMER) || '-';
-                const zone = getColumnValue(row, CONFIG.COLUMNS.ZONE) || '-';
-                const variety = getColumnValue(row, CONFIG.COLUMNS.VARIETY) || '-';
-                const plannedDate = getColumnValue(row, CONFIG.COLUMNS.DATE) || '-';
-                
-                // Calculate urgency
-                let urgency = 'ปกติ';
-                let urgencyClass = 'bg-success';
-                
-                // Estimate due date (based on some logic)
-                const today = new Date();
-                const dueDate = new Date(today);
-                dueDate.setDate(today.getDate() + 30); // Default: 30 days from now
-                
-                const diffTime = dueDate - today;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                
-                if (diffDays <= 7) {
-                    urgency = 'เร่งด่วนมาก';
-                    urgencyClass = 'bg-danger';
-                } else if (diffDays <= 14) {
-                    urgency = 'เร่งด่วน';
-                    urgencyClass = 'bg-warning';
-                }
+                const plotNumber = getColumnValue(row, CONFIG.COLUMNS.data.PLOT_NUMBER) || '-';
+                const farmer = getColumnValue(row, CONFIG.COLUMNS.data.FARMER) || '-';
+                const zone = getColumnValue(row, CONFIG.COLUMNS.data.ZONE) || '-';
+                const variety = getColumnValue(row, CONFIG.COLUMNS.data.VARIETY) || '-';
+                const area = getColumnValue(row, CONFIG.COLUMNS.data.AREA) || '-';
+                const date = getColumnValue(row, CONFIG.COLUMNS.data.DATE) || '-';
                 
                 const tr = `
                     <tr>
@@ -1697,12 +1458,12 @@
                         <td>${farmer}</td>
                         <td>${zone}</td>
                         <td>${variety}</td>
-                        <td>${plannedDate}</td>
-                        <td>${dueDate.toLocaleDateString('th-TH')}</td>
-                        <td><span class="badge ${urgencyClass}">${urgency}</span></td>
+                        <td>${area}</td>
+                        <td>${date}</td>
+                        <td><span class="status-badge status-pending">รอดำเนินการ</span></td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-edit"></i>
+                            <button class="btn btn-sm btn-outline-primary" onclick="markAsCompleted(${row._index})">
+                                <i class="fas fa-check me-1"></i> ทำเครื่องหมาย
                             </button>
                         </td>
                     </tr>
@@ -1714,113 +1475,191 @@
             if (pendingPlots.length === 0) {
                 tbody.append(`
                     <tr>
-                        <td colspan="9" class="text-center text-muted py-3">
-                            ไม่พบแปลงรอดำเนินการ
+                        <td colspan="9" class="text-center text-muted py-4">
+                            <i class="fas fa-check-circle fa-2x mb-2 text-success"></i>
+                            <div>ไม่มีแปลงที่รอดำเนินการ</div>
+                            <small>ทุกแปลงได้รับการดำเนินการเรียบร้อยแล้ว</small>
                         </td>
                     </tr>
                 `);
             }
         }
 
-        function applyFilters() {
-            filters.zone = $('#zoneFilter').val();
-            filters.variety = $('#varietyFilter').val();
-            filters.status = $('#statusFilter').val();
+        function updateCompletedTable() {
+            const tbody = $('#completedTable');
+            tbody.empty();
             
-            // Apply filters
-            filteredData = allData.filter(row => {
-                // Zone filter
-                if (filters.zone) {
-                    const zoneMatch = CONFIG.COLUMNS.ZONE.some(col => 
-                        row[col] && row[col].trim() === filters.zone);
-                    if (!zoneMatch) return false;
-                }
+            // Get all status sheet data
+            const completedPlots = statusSheetData.slice(0, 20); // Show first 20
+            
+            completedPlots.forEach((row, index) => {
+                const plotNumber = getColumnValue(row, CONFIG.COLUMNS.status.PLOT_NUMBER) || '-';
+                const farmer = getColumnValue(row, CONFIG.COLUMNS.status.FARMER) || '-';
+                const zone = getColumnValue(row, CONFIG.COLUMNS.status.ZONE) || '-';
+                const variety = getColumnValue(row, CONFIG.COLUMNS.status.VARIETY) || '-';
+                const date = getColumnValue(row, CONFIG.COLUMNS.status.DATE) || '-';
+                const hasImage = CONFIG.COLUMNS.status.IMAGE.some(col => 
+                    row[col] && row[col].trim() !== '');
+                const note = getColumnValue(row, CONFIG.COLUMNS.status.NOTE) || '-';
                 
-                // Variety filter
-                if (filters.variety) {
-                    const varietyMatch = CONFIG.COLUMNS.VARIETY.some(col => 
-                        row[col] && row[col].trim() === filters.variety);
-                    if (!varietyMatch) return false;
-                }
+                const tr = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${plotNumber}</td>
+                        <td>${farmer}</td>
+                        <td>${zone}</td>
+                        <td>${variety}</td>
+                        <td>${date}</td>
+                        <td>
+                            ${hasImage ? 
+                                '<i class="fas fa-check text-success" title="มีรูปภาพ"></i>' :
+                                '<i class="fas fa-times text-danger" title="ไม่มีรูปภาพ"></i>'}
+                        </td>
+                        <td>${note.length > 50 ? note.substring(0, 50) + '...' : note}</td>
+                    </tr>
+                `;
                 
-                // Status filter
-                if (filters.status) {
-                    const hasDate = CONFIG.COLUMNS.DATE.some(col => 
-                        row[col] && row[col].trim() !== '');
-                    const hasImage = CONFIG.COLUMNS.IMAGE.some(col => 
-                        row[col] && row[col].trim() !== '');
-                    
-                    if (filters.status === 'completed') {
-                        if (!(hasDate && hasImage)) return false;
-                    } else if (filters.status === 'pending') {
-                        if (hasDate) return false;
-                    } else if (filters.status === 'inprogress') {
-                        if (!hasDate || hasImage) return false;
-                    }
-                }
-                
-                return true;
+                tbody.append(tr);
             });
-            
-            // Recalculate statistics
-            calculateStatistics();
-            
-            // Update charts
-            updateAllCharts();
-            
-            // Update tables
-            updateRecentActivityTable();
-            updateZoneSummaryTable();
-            updatePendingPlotsTable();
-            
-            showSuccess(`พบ ${filteredData.length} รายการ หลังจากกรอง`);
         }
 
-        function resetFilters() {
-            $('#zoneFilter').val('');
-            $('#varietyFilter').val('');
-            $('#statusFilter').val('');
-            $('#dateRangePicker').val('');
+        function updateAnalysisMetrics() {
+            // Calculate average completion rate by zone
+            const zoneStats = {};
             
-            filters = {
-                dateRange: null,
-                zone: '',
-                variety: '',
-                status: ''
-            };
+            dataSheetData.forEach(row => {
+                const zone = getColumnValue(row, CONFIG.COLUMNS.data.ZONE) || 'ไม่ระบุ';
+                if (!zoneStats[zone]) {
+                    zoneStats[zone] = { total: 0, completed: 0 };
+                }
+                zoneStats[zone].total++;
+            });
             
-            filteredData = [...allData];
+            // Count completed by zone
+            statusSheetData.forEach(row => {
+                const zone = getColumnValue(row, CONFIG.COLUMNS.status.ZONE) || 'ไม่ระบุ';
+                const plotNumber = getColumnValue(row, CONFIG.COLUMNS.status.PLOT_NUMBER);
+                
+                if (plotNumber && zoneStats[zone]) {
+                    // Check if this plot exists in data sheet
+                    const existsInData = dataSheetData.some(dataRow => {
+                        const dataPlotNumber = getColumnValue(dataRow, CONFIG.COLUMNS.data.PLOT_NUMBER);
+                        return dataPlotNumber === plotNumber;
+                    });
+                    
+                    if (existsInData) {
+                        zoneStats[zone].completed++;
+                    }
+                }
+            });
             
-            // Recalculate statistics
-            calculateStatistics();
+            // Calculate average completion rate
+            let totalRate = 0;
+            let zoneCount = 0;
+            let topZone = '';
+            let topZoneRate = 0;
             
-            // Update charts
-            updateAllCharts();
+            Object.entries(zoneStats).forEach(([zone, stats]) => {
+                if (stats.total > 0) {
+                    const rate = (stats.completed / stats.total) * 100;
+                    totalRate += rate;
+                    zoneCount++;
+                    
+                    if (rate > topZoneRate) {
+                        topZoneRate = rate;
+                        topZone = zone;
+                    }
+                }
+            });
             
-            // Update tables
-            updateRecentActivityTable();
-            updateZoneSummaryTable();
-            updatePendingPlotsTable();
+            const avgCompletionRate = zoneCount > 0 ? Math.round(totalRate / zoneCount) : 0;
+            $('#avgCompletionRate').text(`${avgCompletionRate}%`);
+            $('#topZone').text(`${topZone} (${Math.round(topZoneRate)}%)`);
             
-            showInfo('ล้างตัวกรองเรียบร้อยแล้ว');
+            // Calculate plots per farmer
+            const dataFarmers = countUniqueValues(dataSheetData, CONFIG.COLUMNS.data.FARMER);
+            const statusFarmers = countUniqueValues(statusSheetData, CONFIG.COLUMNS.status.FARMER);
+            
+            const plotsPerFarmerData = dataFarmers > 0 ? 
+                (dataSheetData.length / dataFarmers).toFixed(1) : '0.0';
+            const plotsPerFarmerStatus = statusFarmers > 0 ? 
+                (statusSheetData.length / statusFarmers).toFixed(1) : '0.0';
+            
+            $('#plotsPerFarmerData').text(plotsPerFarmerData);
+            $('#plotsPerFarmerStatus').text(plotsPerFarmerStatus);
+            
+            // Find top variety
+            const varietyCounts = {};
+            
+            mergedData.forEach(item => {
+                const variety = getColumnValue(item,
+                    item._source === 'data' ?
+                    CONFIG.COLUMNS.data.VARIETY :
+                    CONFIG.COLUMNS.status.VARIETY) || 'ไม่ระบุ';
+                
+                if (!varietyCounts[variety]) varietyCounts[variety] = 0;
+                varietyCounts[variety]++;
+            });
+            
+            let topVariety = '';
+            let topVarietyCount = 0;
+            
+            Object.entries(varietyCounts).forEach(([variety, count]) => {
+                if (count > topVarietyCount) {
+                    topVarietyCount = count;
+                    topVariety = variety;
+                }
+            });
+            
+            $('#topVariety').text(`${topVariety} (${topVarietyCount} แปลง)`);
+            
+            // Monthly analysis
+            const monthlyTarget = Math.round(dataSheetData.length / 12);
+            const monthlyActual = Math.round(statusSheetData.length / 12);
+            const monthlyGap = monthlyTarget - monthlyActual;
+            
+            $('#monthlyTarget').text(monthlyTarget);
+            $('#monthlyActual').text(monthlyActual);
+            $('#monthlyGap').text(monthlyGap > 0 ? `+${monthlyGap}` : monthlyGap);
         }
 
         // Helper functions
         function getColumnValue(row, columns) {
+            if (!row || !columns) return null;
+            
             for (const col of columns) {
-                if (row[col] && row[col].trim() !== '') {
-                    return row[col].trim();
+                if (row[col] && row[col].toString().trim() !== '') {
+                    return row[col].toString().trim();
                 }
             }
             return null;
         }
 
-        function showLoading(show) {
+        function countUniqueValues(data, columns) {
+            const values = new Set();
+            
+            data.forEach(row => {
+                const value = getColumnValue(row, columns);
+                if (value) {
+                    values.add(value);
+                }
+            });
+            
+            return values.size;
+        }
+
+        function showLoading(show, message = 'กรุณารอสักครู่...') {
             if (show) {
                 $('#loadingOverlay').show();
+                $('#loadingMessage').text(message);
             } else {
                 $('#loadingOverlay').hide();
             }
+        }
+
+        function updateLoadingProgress(percent, message) {
+            $('#loadingProgress').css('width', `${percent}%`);
+            $('#loadingMessage').text(message);
         }
 
         function showMessage(text, type) {
@@ -1863,133 +1702,144 @@
             $('#dataUpdateTime').text(now.toLocaleDateString('th-TH', options));
         }
 
-        function cacheData(data) {
+        function cacheData(key, data) {
             try {
                 const cacheData = {
                     data: data,
                     timestamp: Date.now()
                 };
-                localStorage.setItem('dashboardDataCache', JSON.stringify(cacheData));
+                localStorage.setItem(`dashboard_${key}`, JSON.stringify(cacheData));
             } catch (e) {
-                console.warn('⚠️ ไม่สามารถแคชข้อมูลได้:', e);
+                console.warn(`⚠️ ไม่สามารถแคชข้อมูล ${key} ได้:`, e);
             }
         }
 
-        function getCachedData() {
+        function getCachedData(key) {
             try {
-                const cached = localStorage.getItem('dashboardDataCache');
+                const cached = localStorage.getItem(`dashboard_${key}`);
                 if (!cached) return null;
                 
                 const cacheData = JSON.parse(cached);
                 const age = Date.now() - cacheData.timestamp;
                 
                 if (age < CONFIG.CACHE_DURATION) {
-                    console.log('📂 โหลดข้อมูลจากแคช');
+                    console.log(`📂 โหลด ${key} จากแคช`);
                     return cacheData.data;
                 } else {
-                    console.log('🗑️ แคชหมดอายุแล้ว');
+                    console.log(`🗑️ แคช ${key} หมดอายุแล้ว`);
                     return null;
                 }
             } catch (e) {
-                console.warn('⚠️ ปัญหาในการอ่านแคช:', e);
+                console.warn(`⚠️ ปัญหาในการอ่านแคช ${key}:`, e);
                 return null;
             }
         }
 
-        // Report functions
-        function exportSummaryReport() {
-            showInfo('กำลังสร้างรายงานสรุป PDF...');
-            // ในที่นี้ควรเชื่อมต่อกับ PDF generation service
+        function clearCache() {
+            localStorage.removeItem('dashboard_dataSheet');
+            localStorage.removeItem('dashboard_statusSheet');
+            console.log('🧹 ล้างแคชเรียบร้อยแล้ว');
         }
 
-        function exportDetailedReport() {
-            const csvData = filteredData.map(row => {
-                return Object.values(row).join(',');
-            }).join('\n');
+        function exportPendingData() {
+            const pendingPlots = mergedData
+                .filter(item => item._source === 'data' && !item._matched);
             
-            const blob = new Blob(['\uFEFF' + csvData], { type: 'text/csv;charset=utf-8' });
+            exportToCSV(pendingPlots, 'แปลงที่รอดำเนินการ');
+        }
+
+        function exportCompletedData() {
+            exportToCSV(statusSheetData, 'แปลงที่ดำเนินการแล้ว');
+        }
+
+        function exportToCSV(data, filenamePrefix) {
+            if (data.length === 0) {
+                showWarning('ไม่มีข้อมูลที่จะส่งออก');
+                return;
+            }
+            
+            // Get headers from first item
+            const headers = Object.keys(data[0]).filter(key => !key.startsWith('_'));
+            
+            const csvRows = [];
+            csvRows.push(headers.join(','));
+            
+            data.forEach(row => {
+                const values = headers.map(header => {
+                    const val = row[header] || '';
+                    return `"${String(val).replace(/"/g, '""')}"`;
+                });
+                csvRows.push(values.join(','));
+            });
+            
+            const csv = csvRows.join('\n');
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            const filename = `${filenamePrefix}_${timestamp}.csv`;
+            
             a.href = url;
-            a.download = `รายงานโครงการผ่ากอ_${new Date().toISOString().slice(0,10)}.csv`;
+            a.download = filename;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             
-            showSuccess('ดาวน์โหลดรายงาน Excel เรียบร้อยแล้ว');
+            showSuccess(`ดาวน์โหลด ${filename} เรียบร้อยแล้ว`);
         }
 
-        function exportCustomReport() {
-            showInfo('เปิดระบบสร้างรายงานกำหนดเอง...');
-            // เปิด modal สำหรับเลือกรายงานกำหนดเอง
+        function markAsCompleted(index) {
+            showInfo('ฟังก์ชันนี้ต้องการการเชื่อมต่อกับ Google Sheets API');
+            // ในระบบจริงควรเชื่อมต่อกับ Google Sheets API เพื่ออัพเดตข้อมูล
         }
 
-        function generateMonthlyReport() {
-            const month = $('#monthSelect').val();
-            showInfo(`กำลังสร้างรายงานประจำเดือน... ${month}`);
-            // สร้างรายงานประจำเดือน
-        }
-
-        function loadMap() {
-            showInfo('กำลังโหลดแผนที่...');
-            // โหลดแผนที่
-            $('#mapContainer').html(`
-                <div class="text-center">
-                    <i class="fas fa-map-marked-alt fa-4x text-primary mb-3"></i>
-                    <h5>แผนที่การกระจายแปลงเกษตร</h5>
-                    <p class="text-muted">แสดงตำแหน่งแปลงเกษตรตามเขตพื้นที่</p>
-                    <div class="mt-4">
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h6>เหนือ</h6>
-                                        <h4>${Math.floor(filteredData.length * 0.3)}</h4>
-                                        <small>แปลง</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h6>ตะวันออกเฉียงเหนือ</h6>
-                                        <h4>${Math.floor(filteredData.length * 0.4)}</h4>
-                                        <small>แปลง</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `);
-        }
-
-        // Create other charts
-        function createProgressChart() {
-            const ctx = document.getElementById('progressChart').getContext('2d');
+        // Create additional charts
+        function createTrendChart() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
             
-            // Sample data
-            const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.'];
-            const target = [100, 100, 100, 100, 100, 100];
-            const actual = [20, 45, 60, 75, 85, 90];
+            // Simulate trend data (last 12 months)
+            const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 
+                           'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
             
-            charts.progressChart = new Chart(ctx, {
-                type: 'bar',
+            // Simulated data
+            const applied = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, dataSheetData.length];
+            const completed = [2, 5, 8, 12, 15, 18, 22, 26, 30, 35, 40, statusSheetData.length];
+            const rate = applied.map((app, i) => 
+                app > 0 ? Math.round((completed[i] / app) * 100) : 0);
+            
+            charts.trendChart = new Chart(ctx, {
+                type: 'line',
                 data: {
                     labels: months,
                     datasets: [
                         {
-                            label: 'เป้าหมาย',
-                            data: target,
-                            backgroundColor: 'rgba(200, 200, 200, 0.5)',
-                            borderWidth: 1
+                            label: 'สมัครแล้ว',
+                            data: applied,
+                            borderColor: '#6f42c1',
+                            backgroundColor: 'rgba(111, 66, 193, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
                         },
                         {
-                            label: 'ผลดำเนินการ',
-                            data: actual,
-                            backgroundColor: 'rgba(52, 168, 83, 0.7)',
-                            borderWidth: 1
+                            label: 'ดำเนินการแล้ว',
+                            data: completed,
+                            borderColor: '#34a853',
+                            backgroundColor: 'rgba(52, 168, 83, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'อัตราการดำเนินการ (%)',
+                            data: rate,
+                            borderColor: '#fbbc05',
+                            backgroundColor: 'rgba(251, 188, 5, 0.1)',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.4,
+                            yAxisID: 'y1'
                         }
                     ]
                 },
@@ -2006,7 +1856,19 @@
                             beginAtZero: true,
                             title: {
                                 display: true,
+                                text: 'จำนวนแปลง'
+                            }
+                        },
+                        y1: {
+                            position: 'right',
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
                                 text: 'เปอร์เซ็นต์'
+                            },
+                            grid: {
+                                drawOnChartArea: false
                             }
                         }
                     }
@@ -2014,20 +1876,20 @@
             });
         }
 
-        function createDistributionChart() {
-            const ctx = document.getElementById('distributionChart').getContext('2d');
+        function createEfficiencyChart() {
+            const ctx = document.getElementById('efficiencyChart').getContext('2d');
             
-            // Sample data
-            const labels = ['0-10 วัน', '11-20 วัน', '21-30 วัน', '31-40 วัน', '41-50 วัน', '51-60 วัน'];
-            const data = [15, 25, 35, 20, 10, 5];
+            // Sample efficiency data by zone
+            const zones = ['เหนือ', 'ตะวันออกเฉียงเหนือ', 'กลาง', 'ใต้'];
+            const efficiency = [85, 65, 90, 75]; // In percentages
             
-            charts.distributionChart = new Chart(ctx, {
+            charts.efficiencyChart = new Chart(ctx, {
                 type: 'radar',
                 data: {
-                    labels: labels,
+                    labels: zones,
                     datasets: [{
-                        label: 'การกระจายตัว',
-                        data: data,
+                        label: 'ประสิทธิภาพการดำเนินการ (%)',
+                        data: efficiency,
                         backgroundColor: 'rgba(26, 115, 232, 0.2)',
                         borderColor: '#1a73e8',
                         borderWidth: 2,
@@ -2037,21 +1899,57 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
                     scales: {
                         r: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
                         }
                     }
                 }
             });
         }
 
-        console.log('✅ Dashboard พร้อมใช้งาน');
+        function createAnalysisChart() {
+            const ctx = document.getElementById('analysisChart').getContext('2d');
+            
+            // Analysis data
+            const categories = ['สมัครสูงสุด', 'ดำเนินการสูงสุด', 'อัตราสูงสุด', 'สมัครต่ำสุด', 'ดำเนินการต่ำสุด'];
+            const values = [100, 85, 90, 20, 15];
+            
+            charts.analysisChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        label: 'คะแนน (เต็ม 100)',
+                        data: values,
+                        backgroundColor: [
+                            '#6f42c1',
+                            '#34a853',
+                            '#fbbc05',
+                            '#dc3545',
+                            '#6c757d'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        console.log('✅ Dashboard โครงการผ่ากอ (2 ชีท) พร้อมใช้งาน');
     </script>
 </body>
 </html>
