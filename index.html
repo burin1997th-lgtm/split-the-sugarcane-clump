@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>โครงการผ่ากอ และบำรุงอ้อยตอ</title>
+    <title>Dashboard - โครงการผ่ากอ และบำรุงอ้อยตอ</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -11,6 +11,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Date Range Picker -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     
     <style>
         :root {
@@ -18,7 +22,9 @@
             --secondary-color: #34a853;
             --warning-color: #fbbc05;
             --danger-color: #ea4335;
+            --info-color: #17a2b8;
             --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
         
         * {
@@ -28,92 +34,27 @@
         body {
             background-color: #f5f7fa;
             padding-top: 20px;
-            padding-bottom: 40px;
+            padding-bottom: 20px;
         }
         
-        .logo-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
+        .dashboard-header {
             background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
-            padding: 20px;
-            border-radius: 10px;
             color: white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .logo-icon {
-            font-size: 3rem;
-            margin-right: 20px;
-        }
-        
-        .project-title {
-            font-weight: 700;
-            margin-bottom: 5px;
-            font-size: 1.8rem;
-        }
-        
-        .project-subtitle {
-            opacity: 0.9;
-            font-size: 0.9rem;
-        }
-        
-        .search-box {
-            background: white;
-            border-radius: 10px;
             padding: 25px;
+            border-radius: 12px;
             margin-bottom: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e0e0e0;
+            box-shadow: var(--card-shadow);
         }
         
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            border: none;
-            margin-bottom: 20px;
-            transition: transform 0.2s;
-            height: 100%;
+        .dashboard-title {
+            font-weight: 700;
+            font-size: 2.2rem;
+            margin-bottom: 5px;
         }
         
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        .card-header {
-            border-radius: 10px 10px 0 0 !important;
-            font-weight: 600;
-            padding: 15px 20px;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-            font-weight: 500;
-        }
-        
-        .btn-primary:hover {
-            background-color: #0d62c9;
-            border-color: #0d62c9;
-        }
-        
-        .btn-success {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
-            font-weight: 500;
-        }
-        
-        .btn-warning {
-            background-color: var(--warning-color);
-            border-color: var(--warning-color);
-            font-weight: 500;
-        }
-        
-        .btn-danger {
-            background-color: var(--danger-color);
-            border-color: var(--danger-color);
-            font-weight: 500;
+        .dashboard-subtitle {
+            opacity: 0.9;
+            font-size: 1rem;
         }
         
         .stats-card {
@@ -121,25 +62,34 @@
             border-radius: 10px;
             padding: 20px;
             text-align: center;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-            transition: all 0.3s;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
             border-top: 4px solid var(--primary-color);
             height: 100%;
         }
         
         .stats-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
         }
+        
+        .stats-card.warning { border-top-color: var(--warning-color); }
+        .stats-card.success { border-top-color: var(--secondary-color); }
+        .stats-card.danger { border-top-color: var(--danger-color); }
+        .stats-card.info { border-top-color: var(--info-color); }
         
         .stats-icon {
             font-size: 2.5rem;
             margin-bottom: 10px;
-            color: var(--primary-color);
         }
         
+        .stats-card.warning .stats-icon { color: var(--warning-color); }
+        .stats-card.success .stats-icon { color: var(--secondary-color); }
+        .stats-card.danger .stats-icon { color: var(--danger-color); }
+        .stats-card.info .stats-icon { color: var(--info-color); }
+        
         .stats-value {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 700;
             margin-bottom: 5px;
             color: #333;
@@ -150,6 +100,47 @@
             font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 1px;
+        }
+        
+        .stats-change {
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        
+        .stats-change.positive { color: var(--secondary-color); }
+        .stats-change.negative { color: var(--danger-color); }
+        
+        .chart-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+            height: 100%;
+        }
+        
+        .chart-title {
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .filter-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .table-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
         }
         
         .table th {
@@ -165,276 +156,712 @@
             vertical-align: middle;
         }
         
-        .table-hover tbody tr:hover {
-            background-color: rgba(26, 115, 232, 0.05);
-            cursor: pointer;
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
         }
         
-        .pagination .page-item.active .page-link {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
+        .status-completed { background: #d4edda; color: #155724; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-inprogress { background: #cce5ff; color: #004085; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+        
+        .dashboard-nav {
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: var(--card-shadow);
         }
         
-        #loading {
-            display: none;
-            text-align: center;
-            padding: 50px 0;
-        }
-        
-        .spinner-border {
-            width: 3rem;
-            height: 3rem;
-        }
-        
-        .preview-image {
-            transition: transform 0.3s ease;
-            border: 2px solid #dee2e6;
-            object-fit: cover;
-        }
-        
-        .preview-image:hover {
-            transform: scale(1.05);
-            border-color: var(--primary-color);
-        }
-        
-        .image-container {
-            background: #f8f9fa;
+        .nav-pills .nav-link {
             border-radius: 8px;
+            margin-right: 10px;
+            font-weight: 500;
+            padding: 8px 20px;
+        }
+        
+        .nav-pills .nav-link.active {
+            background-color: var(--primary-color);
+        }
+        
+        .quick-action-btn {
+            background: white;
+            border: none;
+            border-radius: 10px;
             padding: 15px;
             text-align: center;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s;
+            height: 100%;
         }
         
-        .method-badge {
-            font-size: 0.7rem;
-            background: #e8f0fe;
+        .quick-action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            background-color: #f8f9fa;
+        }
+        
+        .quick-action-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
             color: var(--primary-color);
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-weight: 500;
         }
         
-        footer {
-            margin-top: 40px;
-            padding: 20px 0;
-            border-top: 1px solid #eee;
+        .quick-action-label {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .data-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+            height: 100%;
+        }
+        
+        .data-card h5 {
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .data-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .data-label {
             color: #6c757d;
             font-size: 0.9rem;
         }
         
-        .highlight {
-            background-color: #fff3cd;
-            padding: 0 2px;
-            border-radius: 3px;
-            font-weight: 600;
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         
-        .search-highlight {
-            background-color: #d1ecf1;
-            padding: 0 2px;
-            border-radius: 3px;
-            font-weight: 600;
+        .spinner-border {
+            width: 4rem;
+            height: 4rem;
         }
         
-        .fade-in {
-            animation: fadeIn 0.5s;
+        .summary-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .summary-item:last-child {
+            border-bottom: none;
         }
         
         @media (max-width: 768px) {
-            .logo-container {
+            .dashboard-title {
+                font-size: 1.6rem;
+            }
+            
+            .stats-value {
+                font-size: 1.8rem;
+            }
+            
+            .chart-card {
                 padding: 15px;
             }
-            
-            .logo-icon {
-                font-size: 2rem;
-                margin-right: 15px;
+        }
+        
+        /* Animation for cards */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
-            
-            .project-title {
-                font-size: 1.4rem;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
-            
-            .search-box {
-                padding: 15px;
-            }
-            
-            .stats-card {
-                margin-bottom: 15px;
-            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out;
         }
     </style>
 </head>
 <body>
     <div class="container-fluid">
-        <!-- Header -->
-        <header class="mb-4">
-            <div class="logo-container">
-                <i class="fas fa-tractor logo-icon"></i>
-                <div>
-                    <h1 class="project-title">โครงการผ่ากอ</h1>
-                    <p class="project-subtitle">โครงการผ่ากอ | ฐานข้อมูลแปลงเกษตร</p>
-                    <div class="mt-2">
-                        <span class="badge bg-light text-primary me-2">ออนไลน์</span>
-                        <span class="method-badge" id="currentMethod">Published CSV</span>
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">กำลังโหลด...</span>
+            </div>
+            <h4 class="mt-3">กำลังโหลดข้อมูลจาก Google Sheet</h4>
+            <p class="text-muted">กรุณารอสักครู่...</p>
+        </div>
+        
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="dashboard-title">
+                        <i class="fas fa-chart-line me-2"></i>Dashboard โครงการผ่ากอ
+                    </h1>
+                    <p class="dashboard-subtitle">
+                        ระบบติดตามและวิเคราะห์ข้อมูลแปลงเกษตร | อัพเดตล่าสุด: <span id="lastUpdateTime">-</span>
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button class="btn btn-light me-2" id="refreshDataBtn">
+                        <i class="fas fa-sync-alt me-1"></i> รีเฟรชข้อมูล
+                    </button>
+                    <button class="btn btn-outline-light" id="goToSearchBtn">
+                        <i class="fas fa-search me-1"></i> ไปที่ระบบค้นหา
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Navigation -->
+        <div class="dashboard-nav">
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#overview" data-tab="overview">
+                        <i class="fas fa-home me-1"></i>ภาพรวม
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#analysis" data-tab="analysis">
+                        <i class="fas fa-chart-pie me-1"></i>การวิเคราะห์
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#geographic" data-tab="geographic">
+                        <i class="fas fa-map-marked-alt me-1"></i>ภูมิศาสตร์
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#status" data-tab="status">
+                        <i class="fas fa-clipboard-check me-1"></i>สถานะงาน
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#reports" data-tab="reports">
+                        <i class="fas fa-file-alt me-1"></i>รายงาน
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label class="form-label fw-bold">ช่วงวันที่</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                        <input type="text" class="form-control" id="dateRangePicker" placeholder="เลือกช่วงวันที่">
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label fw-bold">เขตพื้นที่</label>
+                    <select class="form-select" id="zoneFilter">
+                        <option value="">ทั้งหมด</option>
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label fw-bold">พันธุ์อ้อย</label>
+                    <select class="form-select" id="varietyFilter">
+                        <option value="">ทั้งหมด</option>
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label fw-bold">สถานะ</label>
+                    <select class="form-select" id="statusFilter">
+                        <option value="">ทั้งหมด</option>
+                        <option value="completed">ดำเนินการแล้ว</option>
+                        <option value="pending">รอดำเนินการ</option>
+                        <option value="inprogress">กำลังดำเนินการ</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-primary" id="applyFilterBtn">
+                            <i class="fas fa-filter me-1"></i> ใช้ตัวกรอง
+                        </button>
+                        <button class="btn btn-outline-secondary" id="resetFilterBtn">
+                            <i class="fas fa-times me-1"></i> ล้างตัวกรอง
+                        </button>
                     </div>
                 </div>
             </div>
-        </header>
+        </div>
         
-        <!-- Messages Area -->
-        <div id="messages" class="mb-3"></div>
-        
-        <!-- Search Box -->
-        <div class="search-box">
-            <div class="row">
-                <div class="col-lg-8 mb-3">
-                    <div class="card h-100">
-                        <div class="card-header bg-primary text-white">
-                            <i class="fas fa-search me-2"></i>ค้นหาข้อมูล
+        <!-- Overview Tab Content -->
+        <div id="overviewTab" class="tab-content">
+            <!-- Stats Row -->
+            <div class="row mb-4 fade-in-up">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-icon">
+                            <i class="fas fa-tractor"></i>
                         </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">ค้นหาเลขแปลงIntech</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
-                                        <input type="text" class="form-control" id="searchIntechInput" 
-                                               placeholder="เช่น 12345, THA-001, หรือชื่อไฟ">
-                                        <button class="btn btn-primary" type="button" id="searchIntechBtn">
-                                            <i class="fas fa-search me-1"></i> ค้นหา
-                                        </button>
-                                    </div>
-                                    <div class="form-text">
-                                        <i class="fas fa-info-circle me-1"></i> ค้นหาในคอลัมน์: เลขแปลง
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold">ค้นหาทั่วไป</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                        <input type="text" class="form-control" id="searchGeneralInput" 
-                                               placeholder="เช่น ชื่อเกษตรกร, พันธุ์, เขต">
-                                        <button class="btn btn-info" type="button" id="searchGeneralBtn">
-                                            <i class="fas fa-search me-1"></i> ค้นหา
-                                        </button>
-                                    </div>
-                                    <div class="form-text">
-                                        <i class="fas fa-info-circle me-1"></i> ค้นหาในทุกคอลัมน์ที่มีในข้อมูล
-                                    </div>
-                                </div>
+                        <div class="stats-value" id="totalPlots">0</div>
+                        <div class="stats-label">แปลงเกษตรทั้งหมด</div>
+                        <div class="stats-change positive" id="plotChange">
+                            <i class="fas fa-arrow-up me-1"></i>0% จากเดือนที่แล้ว
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card success">
+                        <div class="stats-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stats-value" id="completedPlots">0</div>
+                        <div class="stats-label">แปลงดำเนินการแล้ว</div>
+                        <div class="stats-label" id="completedPercentage">0%</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card warning">
+                        <div class="stats-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stats-value" id="pendingPlots">0</div>
+                        <div class="stats-label">แปลงรอดำเนินการ</div>
+                        <div class="stats-label" id="pendingPercentage">0%</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stats-card info">
+                        <div class="stats-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stats-value" id="totalFarmers">0</div>
+                        <div class="stats-label">เกษตรกรทั้งหมด</div>
+                        <div class="stats-change positive" id="farmerChange">
+                            <i class="fas fa-arrow-up me-1"></i>0% จากเดือนที่แล้ว
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Charts Row -->
+            <div class="row mb-4">
+                <div class="col-lg-6 mb-3">
+                    <div class="chart-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-chart-bar me-2"></i>จำนวนแปลงตามเขตพื้นที่
+                        </h5>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="zoneChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-3">
+                    <div class="chart-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-chart-pie me-2"></i>สัดส่วนพันธุ์อ้อย
+                        </h5>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="varietyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions & Summary -->
+            <div class="row mb-4">
+                <div class="col-lg-4 mb-3">
+                    <div class="data-card">
+                        <h5><i class="fas fa-bolt me-2"></i>ข้อมูลเร่งด่วน</h5>
+                        <div class="summary-item">
+                            <div class="d-flex justify-content-between">
+                                <span>แปลงที่ใกล้ครบกำหนด</span>
+                                <span class="badge bg-warning" id="urgentPlots">0</span>
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="d-flex justify-content-between">
+                                <span>แปลงขาดรูปภาพ</span>
+                                <span class="badge bg-danger" id="missingImages">0</span>
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="d-flex justify-content-between">
+                                <span>แปลงไม่มีข้อมูลเลขแปลง</span>
+                                <span class="badge bg-info" id="missingPlotNumbers">0</span>
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="d-flex justify-content-between">
+                                <span>แปลงดำเนินการล่าสุด (7 วัน)</span>
+                                <span class="badge bg-success" id="recentCompleted">0</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="col-lg-4 mb-3">
-                    <div class="card h-100">
-                        <div class="card-header bg-info text-white">
-                            <i class="fas fa-tools me-2"></i>เครื่องมือ
+                    <div class="data-card">
+                        <h5><i class="fas fa-calendar-check me-2"></i>สถิติตามเดือน</h5>
+                        <div class="chart-container" style="position: relative; height: 200px;">
+                            <canvas id="monthlyChart"></canvas>
                         </div>
-                        <div class="card-body">
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-success" id="loadDataBtn">
-                                    <i class="fas fa-sync-alt me-1"></i> โหลดข้อมูลใหม่
-                                </button>
-                                <button class="btn btn-warning" id="clearSearchBtn">
-                                    <i class="fas fa-times me-1"></i> ล้างการค้นหา
-                                </button>
-                                <button class="btn btn-outline-primary" id="testConnectionBtn">
-                                    <i class="fas fa-wifi me-1"></i> ทดสอบการเชื่อมต่อ
-                                </button>
-                                <button class="btn btn-outline-secondary" id="viewRawDataBtn">
-                                    <i class="fas fa-code me-1"></i> ดูข้อมูลดิบ
-                                </button>
-                                <button class="btn btn-outline-info" id="viewHistoryBtn">
-                                    <i class="fas fa-history me-1"></i> ประวัติการค้นหา
-                                </button>
-                                <button class="btn btn-outline-danger" id="exportDataBtn">
-                                    <i class="fas fa-download me-1"></i> ดาวน์โหลด CSV
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 mb-3">
+                    <div class="data-card">
+                        <h5><i class="fas fa-tachometer-alt me-2"></i>ประสิทธิภาพ</h5>
+                        <div class="summary-item">
+                            <div class="d-flex justify-content-between">
+                                <span>อัตราการดำเนินการ</span>
+                                <span class="fw-bold" id="completionRate">0%</span>
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="d-flex justify-content-between">
+                                <span>แปลงต่อเกษตรกร</span>
+                                <span class="fw-bold" id="plotsPerFarmer">0</span>
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="d-flex justify-content-between">
+                                <span>ระยะเวลาดำเนินการเฉลี่ย (วัน)</span>
+                                <span class="fw-bold" id="avgDuration">0</span>
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="d-flex justify-content-between">
+                                <span>แปลงที่มีรูปภาพครบถ้วน</span>
+                                <span class="fw-bold" id="plotsWithImages">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="table-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-history me-2"></i>กิจกรรมล่าสุด
+                        </h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>เลขแปลง</th>
+                                        <th>เกษตรกร</th>
+                                        <th>เขต</th>
+                                        <th>พันธุ์</th>
+                                        <th>วันที่รอ้ มปลอด</th>
+                                        <th>สถานะ</th>
+                                        <th>รูปภาพ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentActivityTable">
+                                    <!-- Data will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Analysis Tab Content -->
+        <div id="analysisTab" class="tab-content" style="display: none;">
+            <div class="row mb-4">
+                <div class="col-12 mb-3">
+                    <div class="chart-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-chart-line me-2"></i>แนวโน้มการดำเนินงาน
+                        </h5>
+                        <div class="chart-container" style="position: relative; height: 350px;">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-lg-6 mb-3">
+                    <div class="chart-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-calendar-alt me-2"></i>ความคืบหน้าตามเดือน
+                        </h5>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="progressChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-3">
+                    <div class="chart-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-chart-area me-2"></i>การกระจายตัวตามช่วงเวลา
+                        </h5>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="distributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Geographic Tab Content -->
+        <div id="geographicTab" class="tab-content" style="display: none;">
+            <div class="row mb-4">
+                <div class="col-12 mb-3">
+                    <div class="chart-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-map me-2"></i>แผนที่การกระจายแปลงเกษตร
+                        </h5>
+                        <div id="mapContainer" style="height: 400px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                            <div class="text-center">
+                                <i class="fas fa-map-marked-alt fa-4x text-muted mb-3"></i>
+                                <h5>แผนที่การกระจายแปลง</h5>
+                                <p class="text-muted">ระบบแสดงแผนที่ (เตรียมการ)</p>
+                                <button class="btn btn-primary mt-2" id="loadMapBtn">
+                                    <i class="fas fa-map-marked-alt me-1"></i> โหลดแผนที่
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Search Results -->
-        <div id="searchResults" class="mb-4"></div>
-        
-        <!-- Loading Indicator -->
-        <div id="loading">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">กำลังโหลด...</span>
-            </div>
-            <h4 class="mt-3">กำลังโหลดข้อมูลจาก Google Sheet</h4>
-            <p class="text-muted">กรุณารอสักครู่...</p>
-            <div class="progress mt-4" style="height: 6px; width: 300px; margin: 0 auto;">
-                <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
-            </div>
-        </div>
-        
-        <!-- Stats Section -->
-        <div id="statsContainer" class="mb-4">
-            <h5 class="mb-3"><i class="fas fa-chart-bar me-2"></i>สถิติข้อมูล</h5>
-            <div class="row" id="stats">
-                <!-- Stats will be populated by JavaScript -->
-            </div>
-        </div>
-        
-        <!-- Data Section -->
-        <div id="dataSection">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5>
-                    <i class="fas fa-table me-2"></i>
-                    <span id="dataTitle">ข้อมูลทั้งหมด</span>
-                    <span class="badge bg-primary" id="dataCount">0</span>
-                </h5>
-                <div class="text-muted" id="dataInfo">
-                    แสดงข้อมูล 0 รายการ
-                </div>
-            </div>
             
-            <div class="card">
-                <div class="card-body p-0">
-                    <div id="dataTable">
-                        <!-- Data table will be populated by JavaScript -->
+            <div class="row">
+                <div class="col-lg-6 mb-3">
+                    <div class="data-card">
+                        <h5><i class="fas fa-globe-asia me-2"></i>ข้อมูลตามภูมิภาค</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>เขตพื้นที่</th>
+                                        <th>จำนวนแปลง</th>
+                                        <th>เกษตรกร</th>
+                                        <th>ดำเนินการแล้ว</th>
+                                        <th>ความคืบหน้า</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="zoneSummaryTable">
+                                    <!-- Data will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6 mb-3">
+                    <div class="data-card">
+                        <h5><i class="fas fa-trophy me-2"></i>เขตพื้นที่ที่มีการดำเนินการสูงสุด</h5>
+                        <div id="topZonesChart">
+                            <!-- Chart will be populated by JavaScript -->
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Available Columns -->
-        <div id="availableColumns" class="mt-4">
-            <!-- Available columns will be populated by JavaScript -->
+        <!-- Status Tab Content -->
+        <div id="statusTab" class="tab-content" style="display: none;">
+            <div class="row mb-4">
+                <div class="col-lg-8 mb-3">
+                    <div class="chart-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-clipboard-list me-2"></i>สถานะการดำเนินงานทั้งหมด
+                        </h5>
+                        <div class="chart-container" style="position: relative; height: 350px;">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-3">
+                    <div class="data-card">
+                        <h5><i class="fas fa-info-circle me-2"></i>สรุปสถานะ</h5>
+                        <div class="summary-item">
+                            <div class="d-flex justify-content-between">
+                                <span>ดำเนินการแล้ว</span>
+                                <span class="badge bg-success" id="statusCompleted">0</span>
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="d-flex justify-content-between">
+                                <span>รอดำเนินการ</span>
+                                <span class="badge bg-warning" id="statusPending">0</span>
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="d-flex justify-content-between">
+                                <span>กำลังดำเนินการ</span>
+                                <span class="badge bg-info" id="statusInProgress">0</span>
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="d-flex justify-content-between">
+                                <span>ยังไม่ระบุ</span>
+                                <span class="badge bg-secondary" id="statusUnknown">0</span>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <h6>แปลงที่ต้องติดตาม</h6>
+                            <div id="trackingPlots">
+                                <!-- Data will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-12">
+                    <div class="table-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-list-ul me-2"></i>รายการแปลงรอดำเนินการ
+                        </h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>เลขแปลง</th>
+                                        <th>เกษตรกร</th>
+                                        <th>เขต</th>
+                                        <th>พันธุ์</th>
+                                        <th>วันที่รอ้ มปลอด</th>
+                                        <th>วันที่คาดดำเนินการ</th>
+                                        <th>ความเร่งด่วน</th>
+                                        <th>การดำเนินการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pendingPlotsTable">
+                                    <!-- Data will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Reports Tab Content -->
+        <div id="reportsTab" class="tab-content" style="display: none;">
+            <div class="row mb-4">
+                <div class="col-12 mb-3">
+                    <div class="chart-card">
+                        <h5 class="chart-title">
+                            <i class="fas fa-file-alt me-2"></i>รายงานสรุป
+                        </h5>
+                        <div class="row">
+                            <div class="col-lg-4 mb-3">
+                                <div class="quick-action-btn" id="exportSummaryReport">
+                                    <div class="quick-action-icon">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </div>
+                                    <div class="quick-action-label">รายงานสรุป PDF</div>
+                                    <p class="small text-muted mt-2">สรุปข้อมูลทั้งหมดในรูปแบบ PDF</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 mb-3">
+                                <div class="quick-action-btn" id="exportDetailedReport">
+                                    <div class="quick-action-icon">
+                                        <i class="fas fa-file-excel"></i>
+                                    </div>
+                                    <div class="quick-action-label">รายละเอียด Excel</div>
+                                    <p class="small text-muted mt-2">ข้อมูลทั้งหมดในรูปแบบ Excel</p>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 mb-3">
+                                <div class="quick-action-btn" id="exportCustomReport">
+                                    <div class="quick-action-icon">
+                                        <i class="fas fa-cogs"></i>
+                                    </div>
+                                    <div class="quick-action-label">รายงานกำหนดเอง</div>
+                                    <p class="small text-muted mt-2">สร้างรายงานตามที่กำหนด</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-lg-6 mb-3">
+                    <div class="data-card">
+                        <h5><i class="fas fa-chart-bar me-2"></i>ตัวชี้วัดประสิทธิภาพ</h5>
+                        <div id="performanceIndicators">
+                            <!-- Data will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6 mb-3">
+                    <div class="data-card">
+                        <h5><i class="fas fa-calendar-alt me-2"></i>รายงานประจำเดือน</h5>
+                        <div class="mb-3">
+                            <label class="form-label">เลือกเดือน</label>
+                            <select class="form-select" id="monthSelect">
+                                <option value="all">ทั้งหมด</option>
+                                <option value="1">มกราคม</option>
+                                <option value="2">กุมภาพันธ์</option>
+                                <option value="3">มีนาคม</option>
+                                <option value="4">เมษายน</option>
+                                <option value="5">พฤษภาคม</option>
+                                <option value="6">มิถุนายน</option>
+                                <option value="7">กรกฎาคม</option>
+                                <option value="8">สิงหาคม</option>
+                                <option value="9">กันยายน</option>
+                                <option value="10">ตุลาคม</option>
+                                <option value="11">พฤศจิกายน</option>
+                                <option value="12">ธันวาคม</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary w-100" id="generateMonthlyReport">
+                            <i class="fas fa-download me-1"></i> สร้างรายงานประจำเดือน
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <!-- Footer -->
-        <footer class="mt-5">
+        <footer class="mt-5 pt-4 border-top">
             <div class="row">
                 <div class="col-md-6">
-                    <h6><i class="fas fa-cogs me-1"></i> ระบบค้นหาเลขแปลง IN-TECH</h6>
-                    <p>โครงการผ่ากอ | พัฒนาเพื่ออำนวยความสะดวกในการค้นหาข้อมูลแปลงเกษต</p>
+                    <h6><i class="fas fa-tachometer-alt me-1"></i> Dashboard โครงการผ่ากอ</h6>
+                    <p>ระบบติดตามและวิเคราะห์ข้อมูลแปลงเกษตร | เวอร์ชัน 1.0</p>
                     <div class="mt-2">
                         <i class="fas fa-database me-1"></i> Google Sheet ID: 15eCkphn1ZCWJu1fg3ppe3Os-bKxAb4alvC33mAEgGrw
                     </div>
                 </div>
                 <div class="col-md-6 text-md-end">
                     <p>
-                        <i class="fas fa-clock me-1"></i> อัพเดตล่าสุด: <span id="lastUpdate">-</span><br>
-                        <i class="fas fa-code me-1"></i> เวอร์ชัน: 2.0 | พัฒนาด้วย HTML5, Bootstrap 5, jQuery
+                        <i class="fas fa-clock me-1"></i> อัพเดตล่าสุด: <span id="dataUpdateTime">-</span><br>
+                        <i class="fas fa-code me-1"></i> พัฒนาด้วย Bootstrap 5, Chart.js
                     </p>
                 </div>
             </div>
-            <hr>
-            <div class="text-center">
-                <p class="mb-0">
-                    © 2026 โครงการผ่ากอ
+            <div class="text-center mt-3">
+                <p class="mb-0 text-muted">
+                    © 2026 โครงการผ่ากอ | ระบบ Dashboard
                 </p>
             </div>
         </footer>
@@ -444,329 +871,985 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <!-- Date Range Picker -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     
-    <!-- Main JavaScript Code -->
+    <!-- Main Dashboard JavaScript -->
     <script>
-        // Google Drive Image Manager
-        const GoogleDriveManager = {
-            cache: new Map(),
-            
-            parseInput(input) {
-                if (!input) return null;
-                
-                if (this.cache.has(input)) {
-                    return this.cache.get(input);
-                }
-                
-                // File ID pattern (33 characters)
-                if (input.match(/^[a-zA-Z0-9_-]{33}$/)) {
-                    const result = {
-                        type: 'fileId',
-                        id: input,
-                        source: 'drive',
-                        urls: this.generateUrls(input)
-                    };
-                    this.cache.set(input, result);
-                    return result;
-                }
-                
-                // Google Drive URL patterns
-                const patterns = [
-                    { regex: /\/d\/([^\/]+)/, name: 'standard' },
-                    { regex: /id=([^&]+)/, name: 'id_param' },
-                    { regex: /\/folders\/([^\/?]+)/, name: 'folder' }
-                ];
-                
-                for (const pattern of patterns) {
-                    const match = input.match(pattern.regex);
-                    if (match) {
-                        const fileId = match[1];
-                        const result = {
-                            type: pattern.name,
-                            id: fileId,
-                            source: 'drive',
-                            urls: this.generateUrls(fileId)
-                        };
-                        this.cache.set(input, result);
-                        return result;
-                    }
-                }
-                
-                // Check if it's a local image file
-                if (input.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/i)) {
-                    const result = {
-                        type: 'local',
-                        filename: input,
-                        source: 'local',
-                        urls: {
-                            thumbnail: input.startsWith('http') ? input : `สถานะ_Images/${input}`,
-                            full: input.startsWith('http') ? input : `สถานะ_Images/${input}`
-                        }
-                    };
-                    this.cache.set(input, result);
-                    return result;
-                }
-                
-                return null;
-            },
-            
-            generateUrls(fileId) {
-                return {
-                    thumbnail: `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`,
-                    preview: `https://drive.google.com/uc?export=view&id=${fileId}`,
-                    embed: `https://drive.google.com/file/d/${fileId}/preview`,
-                    download: `https://drive.google.com/uc?export=download&id=${fileId}`,
-                    share: `https://drive.google.com/file/d/${fileId}/view`,
-                    fileId: fileId
-                };
-            },
-            
-            createImageElement(imageInfo, options = {}) {
-                const defaults = {
-                    size: 'medium',
-                    showActions: true,
-                    clickable: true,
-                    lazyLoad: true
-                };
-                
-                const config = { ...defaults, ...options };
-                const { urls, type } = imageInfo;
-                
-                if (!urls) return this.createPlaceholder();
-                
-                const sizeMap = {
-                    'small': '80px',
-                    'medium': '120px',
-                    'large': '200px'
-                };
-                
-                const sizeStyle = `width: ${sizeMap[config.size]}; height: ${sizeMap[config.size]};`;
-                
-                let imageHtml = `
-                    <div class="drive-image-wrapper" style="text-align: center;">
-                        <img src="${urls.thumbnail}" 
-                             alt="${type === 'drive' ? 'Google Drive Image' : 'Local Image'}"
-                             class="img-thumbnail preview-image ${config.clickable ? 'clickable' : ''}"
-                             style="${sizeStyle} cursor: ${config.clickable ? 'pointer' : 'default'}; object-fit: cover;"
-                             ${config.lazyLoad ? 'loading="lazy"' : ''}
-                             onerror="this.onerror=null; this.src='https://via.placeholder.com/200/cccccc/666666?text=Image+Error'">
-                `;
-                
-                if (config.showActions && type === 'drive') {
-                    imageHtml += `
-                        <div class="drive-actions mt-2">
-                            <button class="btn btn-sm btn-outline-primary" onclick="GoogleDriveManager.openInDrive('${urls.fileId}')">
-                                <i class="fab fa-google-drive me-1"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-success" onclick="GoogleDriveManager.downloadImage('${urls.fileId}')">
-                                <i class="fas fa-download me-1"></i>
-                            </button>
-                        </div>
-                    `;
-                }
-                
-                imageHtml += `</div>`;
-                
-                return imageHtml;
-            },
-            
-            createPlaceholder() {
-                return `
-                    <div class="image-placeholder" style="text-align: center;">
-                        <div style="width: 80px; height: 80px; background: #f8f9fa; border: 1px dashed #dee2e6; 
-                                    display: inline-flex; align-items: center; justify-content: center; border-radius: 5px;">
-                            <i class="fas fa-image text-muted"></i>
-                        </div>
-                        <div class="text-muted small mt-1">ไม่มีรูปภาพ</div>
-                    </div>
-                `;
-            },
-            
-            openInDrive(fileId) {
-                window.open(`https://drive.google.com/file/d/${fileId}/view`, '_blank');
-            },
-            
-            downloadImage(fileId) {
-                const link = document.createElement('a');
-                link.href = `https://drive.google.com/uc?export=download&id=${fileId}`;
-                link.download = `drive_image_${fileId}.jpg`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            },
-            
-            showImageModal(imageInfo) {
-                if (!imageInfo || !imageInfo.urls) return;
-                
-                const { urls, type } = imageInfo;
-                
-                const modalHtml = `
-                    <div class="modal fade" id="driveImageModal" tabindex="-1">
-                        <div class="modal-dialog modal-xl modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header bg-primary text-white">
-                                    <h5 class="modal-title">
-                                        <i class="${type === 'drive' ? 'fab fa-google-drive' : 'fas fa-image'} me-2"></i>
-                                        ${type === 'drive' ? 'Google Drive Image' : 'Local Image'}
-                                    </h5>
-                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body text-center">
-                                    <div class="image-container mb-3">
-                                        <img src="${urls.preview}" 
-                                             alt="Full size image"
-                                             class="img-fluid rounded"
-                                             style="max-height: 70vh;"
-                                             onerror="this.src='https://via.placeholder.com/800x600/cccccc/666666?text=Image+Not+Found'">
-                                    </div>
-                                    ${type === 'drive' ? `
-                                    <div class="drive-info">
-                                        <p class="text-muted mb-2">
-                                            <small>File ID: <code>${urls.fileId}</code></small>
-                                        </p>
-                                        <div class="btn-group">
-                                            <a href="${urls.share}" class="btn btn-primary" target="_blank">
-                                                <i class="fab fa-google-drive me-1"></i> เปิดใน Drive
-                                            </a>
-                                            <a href="${urls.download}" class="btn btn-success" target="_blank" download>
-                                                <i class="fas fa-download me-1"></i> ดาวน์โหลด
-                                            </a>
-                                            <button class="btn btn-secondary" onclick="navigator.clipboard.writeText('${urls.share}').then(() => alert('คัดลอกลิงก์เรียบร้อยแล้ว'))">
-                                                <i class="fas fa-copy me-1"></i> คัดลอกลิงก์
-                                            </button>
-                                        </div>
-                                    </div>
-                                    ` : ''}
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                        <i class="fas fa-times me-1"></i> ปิด
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                $('body').append(modalHtml);
-                const modal = new bootstrap.Modal(document.getElementById('driveImageModal'));
-                modal.show();
-                
-                $('#driveImageModal').on('hidden.bs.modal', function() {
-                    $(this).remove();
-                });
-            }
-        };
-
-        // ============================================
-        // ระบบค้นหาเลขแปลง IN-TECH - โครงการผ่ากอ
-        // ============================================
-
+        // Configuration
         const CONFIG = {
             SHEET_ID: '15eCkphn1ZCWJu1fg3ppe3Os-bKxAb4alvC33mAEgGrw',
             SHEET_NAME: 'สถานะ',
-            PROJECT_NAME: 'ผ่ากอ',
-            
-            // URL Methods for fetching data
-            URL_METHODS: [
-                {
-                    name: 'Published CSV',
-                    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTHlqFXL5N8DKNhyg8au_M9eypFk65rXRgXdCna7pO9gadqpHLmtcz8FHKeCaBlxuqGcIY60PxUhyu-/pub?gid=980262450&single=true&output=csv',
-                    type: 'csv'
-                },
-                {
-                    name: 'Opensheet',
-                    url: 'https://opensheet.elk.sh/15eCkphn1ZCWJu1fg3ppe3Os-bKxAb4alvC33mAEgGrw/สถานะ',
-                    type: 'json'
-                },
-                {
-                    name: 'Export CSV',
-                    url: 'https://docs.google.com/spreadsheets/d/15eCkphn1ZCWJu1fg3ppe3Os-bKxAb4alvC33mAEgGrw/export?format=csv',
-                    type: 'csv'
-                }
+            DATA_URLS: [
+                'https://docs.google.com/spreadsheets/d/e/2PACX-1vTHlqFXL5N8DKNhyg8au_M9eypFk65rXRgXdCna7pO9gadqpHLmtcz8FHKeCaBlxuqGcIY60PxUhyu-/pub?gid=980262450&single=true&output=csv',
+                'https://opensheet.elk.sh/15eCkphn1ZCWJu1fg3ppe3Os-bKxAb4alvC33mAEgGrw/สถานะ'
             ],
-            
-            // Columns for IN-TECH number search
-            INTECH_SEARCH_COLUMNS: ['เลขแปลงและยกั', 'เลขโครงขา้', 'ชื่อราคาไฟ'],
-            
-            // Columns for image display
-            IMAGE_COLUMNS: ['รูปถ่ายตอนผ่ากอ', 'รูปภาพผ่ากอ', 'ภาพผ่ากอ', 'รูปภาพ', 'ภาพถ่าย'],
-            
-            // Pagination
-            ITEMS_PER_PAGE: 15,
-            
-            // Cache settings
-            CACHE_DURATION: 5 * 60 * 1000, // 5 minutes
+            CACHE_DURATION: 10 * 60 * 1000, // 10 minutes
+            COLUMNS: {
+                PLOT_NUMBER: ['เลขแปลงและยกั', 'เลขโครงขา้', 'ชื่อราคาไฟ'],
+                FARMER: ['ชื่อมโยงเกษตร', 'เกษตรกร'],
+                ZONE: ['เขต', 'พื้นที่'],
+                VARIETY: ['พันธุ์', 'พันธุ์อ้อย'],
+                DATE: ['วันที่รอ้ มปลอด', 'วันที่ดำเนินการ', 'วันที่'],
+                IMAGE: ['รูปถ่ายตอนผ่ากอ', 'รูปภาพผ่ากอ', 'ภาพผ่ากอ']
+            }
         };
 
         // Global variables
         let allData = [];
-        let currentSearchResults = null;
-        let currentSearchTerm = '';
-        let currentPage = 1;
-        let currentMethodIndex = 0;
-        let searchHistory = [];
+        let filteredData = [];
+        let currentTab = 'overview';
+        let charts = {};
+        let filters = {
+            dateRange: null,
+            zone: '',
+            variety: '',
+            status: ''
+        };
 
-        // เมื่อหน้าเว็บโหลด
+        // Initialize when page loads
         $(document).ready(function() {
-            console.log('🚀 เริ่มต้นระบบค้นหาเลขแปลง IN-TECH - โครงการ' + CONFIG.PROJECT_NAME);
+            console.log('📊 เริ่มต้น Dashboard โครงการผ่ากอ');
             
+            initializeDateRangePicker();
             initializeEventListeners();
-            loadInitialData();
+            loadDashboardData();
             
-            // Load search history from localStorage
-            loadSearchHistory();
-            
-            // อัพเดตข้อมูล footer
-            updateFooterInfo();
+            // Update timestamp
+            updateTimestamps();
+            setInterval(updateTimestamps, 60000); // Update every minute
         });
 
-        // ตั้งค่า Event Listeners
+        function initializeDateRangePicker() {
+            $('#dateRangePicker').daterangepicker({
+                opens: 'left',
+                locale: {
+                    format: 'DD/MM/YYYY',
+                    applyLabel: 'ตกลง',
+                    cancelLabel: 'ยกเลิก',
+                    customRangeLabel: 'กำหนดเอง',
+                    daysOfWeek: ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'],
+                    monthNames: ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 
+                                 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม']
+                }
+            }, function(start, end) {
+                filters.dateRange = {
+                    start: start.format('YYYY-MM-DD'),
+                    end: end.format('YYYY-MM-DD')
+                };
+            });
+        }
+
         function initializeEventListeners() {
-            // ปุ่มค้นหาเลขแปลง IN-TECH
-            $('#searchIntechBtn').click(searchIntech);
+            // Tab navigation
+            $('.nav-pills .nav-link').click(function(e) {
+                e.preventDefault();
+                const tabId = $(this).attr('href').substring(1);
+                switchTab(tabId);
+            });
             
-            // ปุ่มค้นหาทั่วไป
-            $('#searchGeneralBtn').click(searchGeneral);
+            // Filter buttons
+            $('#applyFilterBtn').click(applyFilters);
+            $('#resetFilterBtn').click(resetFilters);
             
-            // ปุ่มโหลดข้อมูลใหม่
-            $('#loadDataBtn').click(function() {
-                loadData(true);
-                $(this).html('<i class="fas fa-spinner fa-spin me-1"></i> กำลังโหลด...');
+            // Refresh data
+            $('#refreshDataBtn').click(function() {
+                loadDashboardData(true);
+                $(this).html('<i class="fas fa-spinner fa-spin me-1"></i> กำลังรีเฟรช...');
                 setTimeout(() => {
-                    $(this).html('<i class="fas fa-sync-alt me-1"></i> โหลดข้อมูลใหม่');
+                    $(this).html('<i class="fas fa-sync-alt me-1"></i> รีเฟรชข้อมูล');
                 }, 2000);
             });
             
-            // ปุ่มล้างค้นหา
-            $('#clearSearchBtn').click(clearSearch);
+            // Go to search page
+            $('#goToSearchBtn').click(function() {
+                window.location.href = 'index.html'; // เปลี่ยนเป็น path ที่ถูกต้อง
+            });
             
-            // ปุ่มทดสอบการเชื่อมต่อ
-            $('#testConnectionBtn').click(testConnection);
+            // Quick actions
+            $('#exportSummaryReport').click(exportSummaryReport);
+            $('#exportDetailedReport').click(exportDetailedReport);
+            $('#exportCustomReport').click(exportCustomReport);
+            $('#generateMonthlyReport').click(generateMonthlyReport);
+            $('#loadMapBtn').click(loadMap);
+        }
+
+        function switchTab(tabId) {
+            // Update active tab
+            $('.nav-pills .nav-link').removeClass('active');
+            $(`.nav-link[href="#${tabId}"]`).addClass('active');
             
-            // ปุ่มดูข้อมูลดิบ
-            $('#viewRawDataBtn').click(viewRawData);
+            // Hide all tab content
+            $('.tab-content').hide();
             
-            // ปุ่มดูประวัติการค้นหา
-            $('#viewHistoryBtn').click(showSearchHistory);
+            // Show selected tab content
+            $(`#${tabId}Tab`).show();
             
-            // ปุ่มดาวน์โหลด CSV
-            $('#exportDataBtn').click(exportData);
+            // Update charts for the tab
+            currentTab = tabId;
+            updateChartsForTab(tabId);
+        }
+
+        function loadDashboardData(forceRefresh = false) {
+            showLoading(true);
             
-            // เปิดการค้นหาด้วย Enter
-            $('#searchIntechInput, #searchGeneralInput').keypress(function(e) {
-                if (e.which === 13) {
-                    if ($(this).attr('id') === 'searchIntechInput') {
-                        searchIntech();
-                    } else {
-                        searchGeneral();
+            // Check cache first
+            if (!forceRefresh) {
+                const cachedData = getCachedData();
+                if (cachedData) {
+                    allData = cachedData;
+                    processDashboardData();
+                    return;
+                }
+            }
+            
+            // Load from Google Sheet
+            loadDataFromSheet();
+        }
+
+        function loadDataFromSheet() {
+            console.log('📥 กำลังโหลดข้อมูลจาก Google Sheet...');
+            
+            // Try multiple URLs
+            tryLoadData(0);
+        }
+
+        function tryLoadData(index) {
+            if (index >= CONFIG.DATA_URLS.length) {
+                showError('ไม่สามารถโหลดข้อมูลได้');
+                showLoading(false);
+                return;
+            }
+            
+            const url = CONFIG.DATA_URLS[index];
+            
+            if (url.includes('opensheet.elk.sh')) {
+                // JSON format
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    dataType: 'json',
+                    timeout: 15000,
+                    success: function(data) {
+                        handleDataSuccess(data, 'JSON');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(`❌ JSON ล้มเหลว:`, error);
+                        tryLoadData(index + 1);
+                    }
+                });
+            } else {
+                // CSV format
+                Papa.parse(url, {
+                    download: true,
+                    header: true,
+                    skipEmptyLines: true,
+                    encoding: 'UTF-8',
+                    complete: function(results) {
+                        if (results.data && results.data.length > 0) {
+                            handleDataSuccess(results.data, 'CSV');
+                        } else {
+                            console.log(`❌ CSV ไม่มีข้อมูล`);
+                            tryLoadData(index + 1);
+                        }
+                    },
+                    error: function(error) {
+                        console.error(`❌ CSV ล้มเหลว:`, error);
+                        tryLoadData(index + 1);
+                    }
+                });
+            }
+        }
+
+        function handleDataSuccess(data, source) {
+            console.log(`✅ โหลดข้อมูลสำเร็จ (${source}): ${data.length} รายการ`);
+            
+            allData = data;
+            filteredData = [...data];
+            
+            // Cache data
+            cacheData(data);
+            
+            // Process data
+            processDashboardData();
+            
+            // Update UI
+            updateTimestamps();
+            showSuccess(`โหลดข้อมูลสำเร็จ ${data.length} รายการ`);
+        }
+
+        function processDashboardData() {
+            // Update filter dropdowns
+            updateFilterOptions();
+            
+            // Calculate statistics
+            calculateStatistics();
+            
+            // Update charts
+            updateAllCharts();
+            
+            // Update tables
+            updateRecentActivityTable();
+            updateZoneSummaryTable();
+            updatePendingPlotsTable();
+            
+            showLoading(false);
+        }
+
+        function calculateStatistics() {
+            const totalPlots = filteredData.length;
+            
+            // Count completed plots (has date and image)
+            const completedPlots = filteredData.filter(row => {
+                const hasDate = CONFIG.COLUMNS.DATE.some(col => row[col] && row[col].trim() !== '');
+                const hasImage = CONFIG.COLUMNS.IMAGE.some(col => row[col] && row[col].trim() !== '');
+                return hasDate && hasImage;
+            }).length;
+            
+            // Count pending plots
+            const pendingPlots = filteredData.filter(row => {
+                const hasDate = CONFIG.COLUMNS.DATE.some(col => row[col] && row[col].trim() !== '');
+                return !hasDate;
+            }).length;
+            
+            // Count unique farmers
+            const farmers = new Set();
+            filteredData.forEach(row => {
+                CONFIG.COLUMNS.FARMER.forEach(col => {
+                    if (row[col] && row[col].trim() !== '') {
+                        farmers.add(row[col].trim());
+                    }
+                });
+            });
+            
+            // Urgent plots (based on date)
+            const urgentPlots = filteredData.filter(row => {
+                const dateCol = CONFIG.COLUMNS.DATE.find(col => row[col]);
+                if (!dateCol || !row[dateCol]) return false;
+                
+                // Parse date (assuming DD/MM/YYYY format)
+                const dateParts = row[dateCol].split('/');
+                if (dateParts.length !== 3) return false;
+                
+                const plotDate = new Date(parseInt(dateParts[2]), parseInt(dateParts[1]) - 1, parseInt(dateParts[0]));
+                const today = new Date();
+                const diffTime = plotDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                return diffDays <= 7 && diffDays >= 0; // Due within 7 days
+            }).length;
+            
+            // Missing images
+            const missingImages = filteredData.filter(row => {
+                return !CONFIG.COLUMNS.IMAGE.some(col => row[col] && row[col].trim() !== '');
+            }).length;
+            
+            // Missing plot numbers
+            const missingPlotNumbers = filteredData.filter(row => {
+                return !CONFIG.COLUMNS.PLOT_NUMBER.some(col => row[col] && row[col].trim() !== '');
+            }).length;
+            
+            // Recent completed (last 7 days)
+            const recentCompleted = filteredData.filter(row => {
+                const dateCol = CONFIG.COLUMNS.DATE.find(col => row[col]);
+                if (!dateCol || !row[dateCol]) return false;
+                
+                const dateParts = row[dateCol].split('/');
+                if (dateParts.length !== 3) return false;
+                
+                const plotDate = new Date(parseInt(dateParts[2]), parseInt(dateParts[1]) - 1, parseInt(dateParts[0]));
+                const today = new Date();
+                const diffTime = today - plotDate;
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                
+                return diffDays <= 7;
+            }).length;
+            
+            // Update statistics display
+            $('#totalPlots').text(totalPlots.toLocaleString());
+            $('#completedPlots').text(completedPlots.toLocaleString());
+            $('#completedPercentage').text(`${Math.round((completedPlots / totalPlots) * 100)}%`);
+            $('#pendingPlots').text(pendingPlots.toLocaleString());
+            $('#pendingPercentage').text(`${Math.round((pendingPlots / totalPlots) * 100)}%`);
+            $('#totalFarmers').text(farmers.size.toLocaleString());
+            $('#urgentPlots').text(urgentPlots);
+            $('#missingImages').text(missingImages);
+            $('#missingPlotNumbers').text(missingPlotNumbers);
+            $('#recentCompleted').text(recentCompleted);
+            $('#completionRate').text(`${Math.round((completedPlots / totalPlots) * 100)}%`);
+            $('#plotsPerFarmer').text(farmers.size > 0 ? (totalPlots / farmers.size).toFixed(1) : '0');
+            $('#plotsWithImages').text(`${Math.round(((totalPlots - missingImages) / totalPlots) * 100)}%`);
+            
+            // Status counts
+            $('#statusCompleted').text(completedPlots);
+            $('#statusPending').text(pendingPlots);
+            $('#statusInProgress').text(totalPlots - completedPlots - pendingPlots);
+            $('#statusUnknown').text(0);
+        }
+
+        function updateFilterOptions() {
+            // Zones
+            const zones = new Set();
+            filteredData.forEach(row => {
+                CONFIG.COLUMNS.ZONE.forEach(col => {
+                    if (row[col] && row[col].trim() !== '') {
+                        zones.add(row[col].trim());
+                    }
+                });
+            });
+            
+            $('#zoneFilter').empty().append('<option value="">ทั้งหมด</option>');
+            zones.forEach(zone => {
+                $('#zoneFilter').append(`<option value="${zone}">${zone}</option>`);
+            });
+            
+            // Varieties
+            const varieties = new Set();
+            filteredData.forEach(row => {
+                CONFIG.COLUMNS.VARIETY.forEach(col => {
+                    if (row[col] && row[col].trim() !== '') {
+                        varieties.add(row[col].trim());
+                    }
+                });
+            });
+            
+            $('#varietyFilter').empty().append('<option value="">ทั้งหมด</option>');
+            varieties.forEach(variety => {
+                $('#varietyFilter').append(`<option value="${variety}">${variety}</option>`);
+            });
+        }
+
+        function updateAllCharts() {
+            // Destroy existing charts
+            Object.values(charts).forEach(chart => {
+                if (chart) chart.destroy();
+            });
+            
+            charts = {};
+            
+            // Create charts based on current tab
+            if (currentTab === 'overview') {
+                createZoneChart();
+                createVarietyChart();
+                createMonthlyChart();
+            } else if (currentTab === 'analysis') {
+                createTrendChart();
+                createProgressChart();
+                createDistributionChart();
+            } else if (currentTab === 'status') {
+                createStatusChart();
+            }
+        }
+
+        function updateChartsForTab(tabId) {
+            if (tabId === 'overview') {
+                if (!charts.zoneChart) createZoneChart();
+                if (!charts.varietyChart) createVarietyChart();
+                if (!charts.monthlyChart) createMonthlyChart();
+            } else if (tabId === 'analysis') {
+                if (!charts.trendChart) createTrendChart();
+                if (!charts.progressChart) createProgressChart();
+                if (!charts.distributionChart) createDistributionChart();
+            } else if (tabId === 'status') {
+                if (!charts.statusChart) createStatusChart();
+            }
+        }
+
+        function createZoneChart() {
+            const ctx = document.getElementById('zoneChart').getContext('2d');
+            
+            // Group data by zone
+            const zoneData = {};
+            filteredData.forEach(row => {
+                let zone = 'ไม่ระบุ';
+                CONFIG.COLUMNS.ZONE.forEach(col => {
+                    if (row[col] && row[col].trim() !== '') {
+                        zone = row[col].trim();
+                    }
+                });
+                
+                if (!zoneData[zone]) zoneData[zone] = 0;
+                zoneData[zone]++;
+            });
+            
+            const labels = Object.keys(zoneData);
+            const data = Object.values(zoneData);
+            
+            charts.zoneChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'จำนวนแปลง',
+                        data: data,
+                        backgroundColor: [
+                            '#1a73e8', '#34a853', '#fbbc05', '#ea4335', '#17a2b8',
+                            '#6f42c1', '#fd7e14', '#20c997', '#e83e8c', '#6c757d'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'จำนวนแปลง'
+                            }
+                        }
                     }
                 }
             });
         }
-        
-        // อัพเดตข้อมูลใน footer
-        function updateFooterInfo() {
+
+        function createVarietyChart() {
+            const ctx = document.getElementById('varietyChart').getContext('2d');
+            
+            // Group data by variety
+            const varietyData = {};
+            filteredData.forEach(row => {
+                let variety = 'ไม่ระบุ';
+                CONFIG.COLUMNS.VARIETY.forEach(col => {
+                    if (row[col] && row[col].trim() !== '') {
+                        variety = row[col].trim();
+                    }
+                });
+                
+                if (!varietyData[variety]) varietyData[variety] = 0;
+                varietyData[variety]++;
+            });
+            
+            // Sort and get top 10
+            const sortedVarieties = Object.entries(varietyData)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+            
+            const labels = sortedVarieties.map(v => v[0]);
+            const data = sortedVarieties.map(v => v[1]);
+            
+            charts.varietyChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'จำนวนแปลง',
+                        data: data,
+                        backgroundColor: [
+                            '#1a73e8', '#34a853', '#fbbc05', '#ea4335', '#17a2b8',
+                            '#6f42c1', '#fd7e14', '#20c997', '#e83e8c', '#6c757d'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        }
+
+        function createMonthlyChart() {
+            const ctx = document.getElementById('monthlyChart').getContext('2d');
+            
+            // Group data by month
+            const monthlyData = new Array(12).fill(0);
+            filteredData.forEach(row => {
+                const dateCol = CONFIG.COLUMNS.DATE.find(col => row[col]);
+                if (!dateCol || !row[dateCol]) return;
+                
+                const dateParts = row[dateCol].split('/');
+                if (dateParts.length !== 3) return;
+                
+                const month = parseInt(dateParts[1]) - 1; // 0-based
+                if (month >= 0 && month < 12) {
+                    monthlyData[month]++;
+                }
+            });
+            
+            const monthNames = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 
+                               'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+            
+            charts.monthlyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: monthNames,
+                    datasets: [{
+                        label: 'จำนวนแปลง',
+                        data: monthlyData,
+                        borderColor: '#1a73e8',
+                        backgroundColor: 'rgba(26, 115, 232, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function createTrendChart() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            
+            // Simulate trend data
+            const labels = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 
+                           'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+            const completed = [5, 8, 12, 15, 20, 25, 30, 35, 40, 45, 50, 55];
+            const pending = [100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45];
+            
+            charts.trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'ดำเนินการแล้ว',
+                            data: completed,
+                            borderColor: '#34a853',
+                            backgroundColor: 'rgba(52, 168, 83, 0.1)',
+                            borderWidth: 2,
+                            fill: true
+                        },
+                        {
+                            label: 'รอดำเนินการ',
+                            data: pending,
+                            borderColor: '#fbbc05',
+                            backgroundColor: 'rgba(251, 188, 5, 0.1)',
+                            borderWidth: 2,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'จำนวนแปลง'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createStatusChart() {
+            const ctx = document.getElementById('statusChart').getContext('2d');
+            
+            // Calculate status counts
+            const completed = filteredData.filter(row => {
+                const hasDate = CONFIG.COLUMNS.DATE.some(col => row[col] && row[col].trim() !== '');
+                const hasImage = CONFIG.COLUMNS.IMAGE.some(col => row[col] && row[col].trim() !== '');
+                return hasDate && hasImage;
+            }).length;
+            
+            const pending = filteredData.filter(row => {
+                const hasDate = CONFIG.COLUMNS.DATE.some(col => row[col] && row[col].trim() !== '');
+                return !hasDate;
+            }).length;
+            
+            const inProgress = filteredData.length - completed - pending;
+            
+            charts.statusChart = new Chart(ctx, {
+                type: 'polarArea',
+                data: {
+                    labels: ['ดำเนินการแล้ว', 'กำลังดำเนินการ', 'รอดำเนินการ'],
+                    datasets: [{
+                        label: 'จำนวนแปลง',
+                        data: [completed, inProgress, pending],
+                        backgroundColor: [
+                            'rgba(52, 168, 83, 0.7)',
+                            'rgba(26, 115, 232, 0.7)',
+                            'rgba(251, 188, 5, 0.7)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateRecentActivityTable() {
+            const tbody = $('#recentActivityTable');
+            tbody.empty();
+            
+            // Get recent 10 rows
+            const recentData = filteredData.slice(0, 10);
+            
+            recentData.forEach((row, index) => {
+                const plotNumber = getColumnValue(row, CONFIG.COLUMNS.PLOT_NUMBER) || '-';
+                const farmer = getColumnValue(row, CONFIG.COLUMNS.FARMER) || '-';
+                const zone = getColumnValue(row, CONFIG.COLUMNS.ZONE) || '-';
+                const variety = getColumnValue(row, CONFIG.COLUMNS.VARIETY) || '-';
+                const date = getColumnValue(row, CONFIG.COLUMNS.DATE) || '-';
+                const hasImage = CONFIG.COLUMNS.IMAGE.some(col => row[col] && row[col].trim() !== '');
+                
+                // Determine status
+                let status = 'รอดำเนินการ';
+                let statusClass = 'status-pending';
+                
+                if (date !== '-') {
+                    if (hasImage) {
+                        status = 'ดำเนินการแล้ว';
+                        statusClass = 'status-completed';
+                    } else {
+                        status = 'กำลังดำเนินการ';
+                        statusClass = 'status-inprogress';
+                    }
+                }
+                
+                const tr = `
+                    <tr>
+                        <td>${plotNumber}</td>
+                        <td>${farmer}</td>
+                        <td>${zone}</td>
+                        <td>${variety}</td>
+                        <td>${date}</td>
+                        <td><span class="status-badge ${statusClass}">${status}</span></td>
+                        <td>
+                            ${hasImage ? 
+                                '<i class="fas fa-check text-success"></i>' : 
+                                '<i class="fas fa-times text-danger"></i>'}
+                        </td>
+                    </tr>
+                `;
+                
+                tbody.append(tr);
+            });
+            
+            if (recentData.length === 0) {
+                tbody.append(`
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-3">
+                            ไม่พบข้อมูล
+                        </td>
+                    </tr>
+                `);
+            }
+        }
+
+        function updateZoneSummaryTable() {
+            const tbody = $('#zoneSummaryTable');
+            tbody.empty();
+            
+            // Group data by zone
+            const zoneSummary = {};
+            
+            filteredData.forEach(row => {
+                let zone = 'ไม่ระบุ';
+                CONFIG.COLUMNS.ZONE.forEach(col => {
+                    if (row[col] && row[col].trim() !== '') {
+                        zone = row[col].trim();
+                    }
+                });
+                
+                if (!zoneSummary[zone]) {
+                    zoneSummary[zone] = {
+                        plots: 0,
+                        farmers: new Set(),
+                        completed: 0
+                    };
+                }
+                
+                zoneSummary[zone].plots++;
+                
+                // Add farmer
+                CONFIG.COLUMNS.FARMER.forEach(col => {
+                    if (row[col] && row[col].trim() !== '') {
+                        zoneSummary[zone].farmers.add(row[col].trim());
+                    }
+                });
+                
+                // Check if completed
+                const hasDate = CONFIG.COLUMNS.DATE.some(col => row[col] && row[col].trim() !== '');
+                const hasImage = CONFIG.COLUMNS.IMAGE.some(col => row[col] && row[col].trim() !== '');
+                if (hasDate && hasImage) {
+                    zoneSummary[zone].completed++;
+                }
+            });
+            
+            // Convert to array and sort by plot count
+            const sortedZones = Object.entries(zoneSummary)
+                .sort((a, b) => b[1].plots - a[1].plots)
+                .slice(0, 8);
+            
+            sortedZones.forEach(([zone, data]) => {
+                const completionRate = data.plots > 0 ? 
+                    Math.round((data.completed / data.plots) * 100) : 0;
+                
+                const tr = `
+                    <tr>
+                        <td>${zone}</td>
+                        <td>${data.plots}</td>
+                        <td>${data.farmers.size}</td>
+                        <td>${data.completed}</td>
+                        <td>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: ${completionRate}%;" 
+                                     aria-valuenow="${completionRate}" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                </div>
+                            </div>
+                            <small>${completionRate}%</small>
+                        </td>
+                    </tr>
+                `;
+                
+                tbody.append(tr);
+            });
+            
+            if (sortedZones.length === 0) {
+                tbody.append(`
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-3">
+                            ไม่พบข้อมูล
+                        </td>
+                    </tr>
+                `);
+            }
+        }
+
+        function updatePendingPlotsTable() {
+            const tbody = $('#pendingPlotsTable');
+            tbody.empty();
+            
+            // Get pending plots
+            const pendingPlots = filteredData.filter(row => {
+                const hasDate = CONFIG.COLUMNS.DATE.some(col => row[col] && row[col].trim() !== '');
+                return !hasDate;
+            }).slice(0, 15); // Limit to 15 rows
+            
+            pendingPlots.forEach((row, index) => {
+                const plotNumber = getColumnValue(row, CONFIG.COLUMNS.PLOT_NUMBER) || '-';
+                const farmer = getColumnValue(row, CONFIG.COLUMNS.FARMER) || '-';
+                const zone = getColumnValue(row, CONFIG.COLUMNS.ZONE) || '-';
+                const variety = getColumnValue(row, CONFIG.COLUMNS.VARIETY) || '-';
+                const plannedDate = getColumnValue(row, CONFIG.COLUMNS.DATE) || '-';
+                
+                // Calculate urgency
+                let urgency = 'ปกติ';
+                let urgencyClass = 'bg-success';
+                
+                // Estimate due date (based on some logic)
+                const today = new Date();
+                const dueDate = new Date(today);
+                dueDate.setDate(today.getDate() + 30); // Default: 30 days from now
+                
+                const diffTime = dueDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays <= 7) {
+                    urgency = 'เร่งด่วนมาก';
+                    urgencyClass = 'bg-danger';
+                } else if (diffDays <= 14) {
+                    urgency = 'เร่งด่วน';
+                    urgencyClass = 'bg-warning';
+                }
+                
+                const tr = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${plotNumber}</td>
+                        <td>${farmer}</td>
+                        <td>${zone}</td>
+                        <td>${variety}</td>
+                        <td>${plannedDate}</td>
+                        <td>${dueDate.toLocaleDateString('th-TH')}</td>
+                        <td><span class="badge ${urgencyClass}">${urgency}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                
+                tbody.append(tr);
+            });
+            
+            if (pendingPlots.length === 0) {
+                tbody.append(`
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-3">
+                            ไม่พบแปลงรอดำเนินการ
+                        </td>
+                    </tr>
+                `);
+            }
+        }
+
+        function applyFilters() {
+            filters.zone = $('#zoneFilter').val();
+            filters.variety = $('#varietyFilter').val();
+            filters.status = $('#statusFilter').val();
+            
+            // Apply filters
+            filteredData = allData.filter(row => {
+                // Zone filter
+                if (filters.zone) {
+                    const zoneMatch = CONFIG.COLUMNS.ZONE.some(col => 
+                        row[col] && row[col].trim() === filters.zone);
+                    if (!zoneMatch) return false;
+                }
+                
+                // Variety filter
+                if (filters.variety) {
+                    const varietyMatch = CONFIG.COLUMNS.VARIETY.some(col => 
+                        row[col] && row[col].trim() === filters.variety);
+                    if (!varietyMatch) return false;
+                }
+                
+                // Status filter
+                if (filters.status) {
+                    const hasDate = CONFIG.COLUMNS.DATE.some(col => 
+                        row[col] && row[col].trim() !== '');
+                    const hasImage = CONFIG.COLUMNS.IMAGE.some(col => 
+                        row[col] && row[col].trim() !== '');
+                    
+                    if (filters.status === 'completed') {
+                        if (!(hasDate && hasImage)) return false;
+                    } else if (filters.status === 'pending') {
+                        if (hasDate) return false;
+                    } else if (filters.status === 'inprogress') {
+                        if (!hasDate || hasImage) return false;
+                    }
+                }
+                
+                return true;
+            });
+            
+            // Recalculate statistics
+            calculateStatistics();
+            
+            // Update charts
+            updateAllCharts();
+            
+            // Update tables
+            updateRecentActivityTable();
+            updateZoneSummaryTable();
+            updatePendingPlotsTable();
+            
+            showSuccess(`พบ ${filteredData.length} รายการ หลังจากกรอง`);
+        }
+
+        function resetFilters() {
+            $('#zoneFilter').val('');
+            $('#varietyFilter').val('');
+            $('#statusFilter').val('');
+            $('#dateRangePicker').val('');
+            
+            filters = {
+                dateRange: null,
+                zone: '',
+                variety: '',
+                status: ''
+            };
+            
+            filteredData = [...allData];
+            
+            // Recalculate statistics
+            calculateStatistics();
+            
+            // Update charts
+            updateAllCharts();
+            
+            // Update tables
+            updateRecentActivityTable();
+            updateZoneSummaryTable();
+            updatePendingPlotsTable();
+            
+            showInfo('ล้างตัวกรองเรียบร้อยแล้ว');
+        }
+
+        // Helper functions
+        function getColumnValue(row, columns) {
+            for (const col of columns) {
+                if (row[col] && row[col].trim() !== '') {
+                    return row[col].trim();
+                }
+            }
+            return null;
+        }
+
+        function showLoading(show) {
+            if (show) {
+                $('#loadingOverlay').show();
+            } else {
+                $('#loadingOverlay').hide();
+            }
+        }
+
+        function showMessage(text, type) {
+            const icon = type === 'success' ? 'check-circle' : 
+                        type === 'error' ? 'exclamation-circle' : 
+                        type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+            
+            const alert = `
+                <div class="alert alert-${type} alert-dismissible fade show position-fixed" 
+                     style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                    <i class="fas fa-${icon} me-2"></i>
+                    ${text}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            $('body').append(alert);
+            
+            setTimeout(() => {
+                $('.alert').alert('close');
+            }, 5000);
+        }
+
+        function showSuccess(text) { showMessage(text, 'success'); }
+        function showError(text) { showMessage(text, 'danger'); }
+        function showWarning(text) { showMessage(text, 'warning'); }
+        function showInfo(text) { showMessage(text, 'info'); }
+
+        function updateTimestamps() {
             const now = new Date();
             const options = { 
                 year: 'numeric', 
@@ -775,894 +1858,18 @@
                 hour: '2-digit',
                 minute: '2-digit'
             };
-            $('#lastUpdate').text(now.toLocaleDateString('th-TH', options));
-            $('#currentMethod').text(CONFIG.URL_METHODS[currentMethodIndex].name);
+            
+            $('#lastUpdateTime').text(now.toLocaleDateString('th-TH', options));
+            $('#dataUpdateTime').text(now.toLocaleDateString('th-TH', options));
         }
-
-        // โหลดข้อมูลเริ่มต้น
-        function loadInitialData() {
-            showLoading(true);
-            
-            // ตรวจสอบแคชก่อน
-            const cachedData = getCachedData();
-            if (cachedData) {
-                allData = cachedData;
-                displayData(allData);
-                updateStatistics();
-                updateDataTitle('ข้อมูลทั้งหมด');
-                showMessage('โหลดข้อมูลจากแคชสำเร็จ', 'success');
-                showLoading(false);
-                updateFooterInfo();
-                return;
-            }
-            
-            // ถ้าไม่มีแคช ให้โหลดใหม่
-            loadData();
-        }
-
-        // โหลดข้อมูลจาก Google Sheet
-        function loadData(forceRefresh = false) {
-            console.log('📥 กำลังโหลดข้อมูลจาก Google Sheet...');
-            
-            if (forceRefresh) {
-                // ล้างแคช
-                clearCache();
-            }
-            
-            showLoading(true);
-            showMessage('กำลังเชื่อมต่อกับ Google Sheet...', 'info');
-            
-            // ลองโหลดด้วยวิธีปัจจุบัน
-            tryLoadMethod(currentMethodIndex);
-        }
-
-        function tryLoadMethod(index) {
-            if (index >= CONFIG.URL_METHODS.length) {
-                showError('ไม่สามารถเชื่อมต่อกับ Google Sheet ได้');
-                showLoading(false);
-                currentMethodIndex = 0; // รีเซ็ตกลับไปใช้วิธีแรก
-                updateFooterInfo();
-                return;
-            }
-            
-            const method = CONFIG.URL_METHODS[index];
-            console.log(`🔄 ลองโหลดด้วยวิธี: ${method.name}`);
-            
-            if (method.type === 'json') {
-                // ใช้ JSON (opensheet)
-                $.ajax({
-                    url: method.url,
-                    method: 'GET',
-                    dataType: 'json',
-                    timeout: 15000,
-                    success: function(data) {
-                        handleDataSuccess(data, method.name);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(`❌ ${method.name} ล้มเหลว:`, error);
-                        tryLoadMethod(index + 1);
-                    }
-                });
-            } else {
-                // ใช้ CSV
-                Papa.parse(method.url, {
-                    download: true,
-                    header: true,
-                    skipEmptyLines: true,
-                    encoding: 'UTF-8',
-                    complete: function(results) {
-                        if (results.data && results.data.length > 0) {
-                            handleDataSuccess(results.data, method.name);
-                        } else {
-                            console.log(`❌ ${method.name} ไม่มีข้อมูล`);
-                            tryLoadMethod(index + 1);
-                        }
-                    },
-                    error: function(error) {
-                        console.error(`❌ ${method.name} ล้มเหลว:`, error);
-                        tryLoadMethod(index + 1);
-                    }
-                });
-            }
-        }
-
-        function handleDataSuccess(data, methodName) {
-            console.log(`✅ ${methodName} สำเร็จ: ${data.length} รายการ`);
-            
-            allData = data;
-            currentSearchResults = null;
-            currentSearchTerm = '';
-            currentPage = 1;
-            
-            // แคชข้อมูล
-            cacheData(allData);
-            
-            // แสดงข้อมูล
-            displayData(allData);
-            
-            // อัปเดตสถิติ
-            updateStatistics();
-            
-            // อัปเดตหัวข้อ
-            updateDataTitle('ข้อมูลทั้งหมด');
-            
-            // ตรวจสอบคอลัมน์ที่มี
-            checkAvailableColumns();
-            
-            // แสดงข้อความสำเร็จ
-            showSuccess(`โหลดข้อมูลสำเร็จ ${data.length} รายการ (ใช้ ${methodName})`);
-            
-            showLoading(false);
-            
-            // บันทึก method ที่ใช้งานได้
-            currentMethodIndex = CONFIG.URL_METHODS.findIndex(m => m.name === methodName);
-            updateFooterInfo();
-        }
-
-        // ============================================
-        // ฟังก์ชันค้นหาเลขแปลง IN-TECH
-        // ============================================
-
-        function searchIntech() {
-            const searchValue = $('#searchIntechInput').val().trim();
-            
-            if (!searchValue) {
-                showWarning('กรุณากรอกเลขแปลงที่ต้องการค้นหา');
-                $('#searchIntechInput').focus();
-                return;
-            }
-            
-            if (allData.length === 0) {
-                showWarning('ยังไม่มีข้อมูล โปรดโหลดข้อมูลก่อน');
-                return;
-            }
-            
-            console.log(`🔍 ค้นหาเลขแปลง IN-TECH: "${searchValue}"`);
-            
-            // ค้นหาในคอลัมน์ที่กำหนด
-            const results = [];
-            const searchLower = searchValue.toLowerCase();
-            
-            allData.forEach((row, index) => {
-                let found = false;
-                
-                CONFIG.INTECH_SEARCH_COLUMNS.forEach(column => {
-                    if (row[column]) {
-                        const cellValue = String(row[column]).toLowerCase();
-                        if (cellValue.includes(searchLower)) {
-                            found = true;
-                        }
-                    }
-                });
-                
-                if (found) {
-                    results.push({
-                        ...row,
-                        _rowIndex: index,
-                        _searchMatch: true
-                    });
-                }
-            });
-            
-            if (results.length === 0) {
-                showWarning(`ไม่พบเลขแปลง "${searchValue}" ในระบบ`);
-                return;
-            }
-            
-            // บันทึกประวัติการค้นหา
-            saveToSearchHistory({
-                type: 'เลขแปลง IN-TECH',
-                keyword: searchValue,
-                results: results.length,
-                timestamp: new Date().toISOString(),
-                columns: CONFIG.INTECH_SEARCH_COLUMNS
-            });
-            
-            // เก็บผลการค้นหา
-            currentSearchResults = results;
-            currentSearchTerm = searchValue;
-            currentPage = 1;
-            
-            // แสดงผลการค้นหา
-            displaySearchResults(results, searchValue, 'intech');
-            
-            // แสดงข้อความสำเร็จ
-            showSuccess(`พบ ${results.length} รายการที่ตรงกับเลขแปลง "${searchValue}"`);
-            
-            // Scroll to results
-            $('html, body').animate({
-                scrollTop: $('#searchResults').offset().top - 100
-            }, 500);
-        }
-
-        function searchGeneral() {
-            const searchValue = $('#searchGeneralInput').val().trim();
-            
-            if (!searchValue) {
-                showWarning('กรุณากรอกคำค้นหา');
-                $('#searchGeneralInput').focus();
-                return;
-            }
-            
-            if (allData.length === 0) {
-                showWarning('ยังไม่มีข้อมูล โปรดโหลดข้อมูลก่อน');
-                return;
-            }
-            
-            console.log(`🔍 ค้นหาทั่วไป: "${searchValue}"`);
-            
-            // ค้นหาในทุกคอลัมน์
-            const results = [];
-            const searchLower = searchValue.toLowerCase();
-            
-            allData.forEach((row, index) => {
-                let found = false;
-                
-                Object.keys(row).forEach(column => {
-                    if (row[column]) {
-                        const cellValue = String(row[column]).toLowerCase();
-                        if (cellValue.includes(searchLower)) {
-                            found = true;
-                        }
-                    }
-                });
-                
-                if (found) {
-                    results.push({
-                        ...row,
-                        _rowIndex: index,
-                        _searchMatch: true
-                    });
-                }
-            });
-            
-            if (results.length === 0) {
-                showWarning(`ไม่พบ "${searchValue}" ในระบบ`);
-                return;
-            }
-            
-            // บันทึกประวัติการค้นหา
-            saveToSearchHistory({
-                type: 'ค้นหาทั่วไป',
-                keyword: searchValue,
-                results: results.length,
-                timestamp: new Date().toISOString(),
-                columns: 'ทั้งหมด'
-            });
-            
-            // เก็บผลการค้นหา
-            currentSearchResults = results;
-            currentSearchTerm = searchValue;
-            currentPage = 1;
-            
-            // แสดงผลการค้นหา
-            displaySearchResults(results, searchValue, 'general');
-            
-            // แสดงข้อความสำเร็จ
-            showSuccess(`พบ ${results.length} รายการที่ตรงกับ "${searchValue}"`);
-            
-            // Scroll to results
-            $('html, body').animate({
-                scrollTop: $('#searchResults').offset().top - 100
-            }, 500);
-        }
-
-        function displaySearchResults(results, searchTerm, searchType) {
-            const searchTypeText = searchType === 'intech' ? 'เลขแปลง IN-TECH' : 'ทั่วไป';
-            
-            let html = `
-                <div class="card border-primary mb-3 fade-in">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">
-                            <i class="fas fa-search me-2"></i>
-                            ผลการค้นหา${searchType === 'intech' ? 'เลขแปลง' : ''}: "${searchTerm}"
-                            <span class="badge bg-light text-primary ms-2">${results.length} รายการ</span>
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle me-2"></i>
-                            ค้นหาประเภท: <strong>${searchTypeText}</strong> | 
-                            พบทั้งหมด <strong>${results.length}</strong> รายการ
-                        </div>
-            `;
-            
-            // แสดงข้อมูลในตาราง
-            html += createResultsTable(results, searchTerm, searchType);
-            
-            html += `
-                    </div>
-                    <div class="card-footer">
-                        <div class="d-flex flex-wrap gap-2">
-                            <button class="btn btn-sm btn-primary" onclick="exportSearchResults()">
-                                <i class="fas fa-download me-1"></i> ดาวน์โหลดผลการค้นหา
-                            </button>
-                            <button class="btn btn-sm btn-outline-primary" onclick="printSearchResults()">
-                                <i class="fas fa-print me-1"></i> พิมพ์ผลการค้นหา
-                            </button>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="clearSearch()">
-                                <i class="fas fa-times me-1"></i> ล้างการค้นหา
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            $('#searchResults').html(html);
-            
-            // แสดงข้อมูลในตารางหลัก
-            displayData(results);
-            
-            // อัปเดตหัวข้อ
-            updateDataTitle(`ผลการค้นหา: "${searchTerm}"`);
-        }
-
-        function createResultsTable(results, searchTerm, searchType) {
-            if (results.length === 0) return '<p class="text-center text-muted">ไม่พบข้อมูล</p>';
-            
-            // ใช้ headers จากข้อมูล
-            const headers = Object.keys(results[0]).filter(h => !h.startsWith('_'));
-            const importantColumns = ['เลขแปลงและยกั', 'ชื่อมโยงเกษตร', 'เขต', 'พันธุ์', 'วันที่รอ้ มปลอด'];
-            
-            const startIdx = (currentPage - 1) * CONFIG.ITEMS_PER_PAGE;
-            const endIdx = Math.min(startIdx + CONFIG.ITEMS_PER_PAGE, results.length);
-            const totalPages = Math.ceil(results.length / CONFIG.ITEMS_PER_PAGE);
-            
-            let html = `
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover">
-                        <thead>
-                            <tr>
-                                <th width="50">#</th>
-            `;
-            
-            // แสดงคอลัมน์สำคัญ
-            importantColumns.forEach(col => {
-                if (headers.includes(col)) {
-                    html += `<th>${col}</th>`;
-                }
-            });
-            
-            html += `</tr></thead><tbody>`;
-            
-            for (let i = startIdx; i < endIdx; i++) {
-                const row = results[i];
-                html += `<tr onclick="showRowDetail(${row._rowIndex})" style="cursor: pointer;">`;
-                html += `<td class="fw-bold">${i + 1}</td>`;
-                
-                importantColumns.forEach(col => {
-                    if (headers.includes(col)) {
-                        let value = row[col] || '';
-                        let displayValue = String(value);
-                        
-                        // ไฮไลต์ข้อความที่ค้นหา
-                        if (searchTerm && displayValue.toLowerCase().includes(searchTerm.toLowerCase())) {
-                            const regex = new RegExp(`(${searchTerm})`, 'gi');
-                            displayValue = displayValue.replace(regex, '<span class="search-highlight">$1</span>');
-                        }
-                        
-                        html += `<td>${displayValue}</td>`;
-                    }
-                });
-                
-                html += `</tr>`;
-            }
-            
-            html += `</tbody></table></div>`;
-            
-            // Pagination
-            if (totalPages > 1) {
-                html += createPagination(totalPages, 'search');
-            }
-            
-            return html;
-        }
-
-        function displayData(dataToShow = allData) {
-            if (!dataToShow || dataToShow.length === 0) {
-                $('#dataTable').html(`
-                    <div class="text-center py-5">
-                        <i class="fas fa-database fa-3x text-muted mb-3"></i>
-                        <h5>ไม่พบข้อมูล</h5>
-                        <p class="text-muted">ไม่สามารถโหลดข้อมูลได้</p>
-                    </div>
-                `);
-                $('#dataCount').text('0');
-                return;
-            }
-            
-            const headers = Object.keys(dataToShow[0]).filter(h => !h.startsWith('_'));
-            const startIdx = (currentPage - 1) * CONFIG.ITEMS_PER_PAGE;
-            const endIdx = Math.min(startIdx + CONFIG.ITEMS_PER_PAGE, dataToShow.length);
-            const totalPages = Math.ceil(dataToShow.length / CONFIG.ITEMS_PER_PAGE);
-            
-            let html = `
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
-                        <thead class="table-dark">
-                            <tr>
-                                <th width="50">#</th>
-            `;
-            
-            // แสดงคอลัมน์ทั้งหมด
-            headers.forEach(header => {
-                html += `<th>${formatHeader(header)}</th>`;
-            });
-            
-            html += `</tr></thead><tbody>`;
-            
-            for (let i = startIdx; i < endIdx; i++) {
-                const row = dataToShow[i];
-                const originalIndex = row._rowIndex !== undefined ? row._rowIndex : i;
-                
-                html += `<tr onclick="showRowDetail(${originalIndex})" style="cursor: pointer;">`;
-                html += `<td class="text-center fw-bold">${i + 1}</td>`;
-                
-                headers.forEach(header => {
-                    let value = row[header] || '';
-                    let displayValue = formatValue(value, header);
-                    
-                    // ไฮไลต์ถ้าเป็นผลการค้นหา
-                    if (currentSearchTerm && currentSearchResults && 
-                        String(value).toLowerCase().includes(currentSearchTerm.toLowerCase())) {
-                        displayValue = displayValue.replace(
-                            new RegExp(`(${currentSearchTerm})`, 'gi'),
-                            '<span class="highlight">$1</span>'
-                        );
-                    }
-                    
-                    html += `<td>${displayValue}</td>`;
-                });
-                
-                html += `</tr>`;
-            }
-            
-            html += `</tbody></table></div>`;
-            
-            // Pagination
-            if (totalPages > 1) {
-                html += createPagination(totalPages, 'data');
-            }
-            
-            $('#dataTable').html(html);
-            $('#dataInfo').html(`
-                แสดง <strong>${startIdx + 1}-${endIdx}</strong> จากทั้งหมด <strong>${dataToShow.length}</strong> รายการ
-            `);
-            $('#dataCount').text(dataToShow.length.toLocaleString());
-        }
-
-        function createPagination(totalPages, type) {
-            let html = `
-                <nav aria-label="Page navigation" class="mt-3">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                            <a class="page-link" href="#" onclick="changePage(${currentPage - 1}, '${type}')">
-                                <i class="fas fa-chevron-left"></i>
-                            </a>
-                        </li>
-            `;
-            
-            const maxVisible = 5;
-            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
-            
-            if (endPage - startPage + 1 < maxVisible) {
-                startPage = Math.max(1, endPage - maxVisible + 1);
-            }
-            
-            for (let i = startPage; i <= endPage; i++) {
-                html += `
-                    <li class="page-item ${i === currentPage ? 'active' : ''}">
-                        <a class="page-link" href="#" onclick="changePage(${i}, '${type}')">${i}</a>
-                    </li>
-                `;
-            }
-            
-            html += `
-                        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                            <a class="page-link" href="#" onclick="changePage(${currentPage + 1}, '${type}')">
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            `;
-            
-            return html;
-        }
-
-        function changePage(page, type) {
-            if (page < 1 || page > Math.ceil((currentSearchResults || allData).length / CONFIG.ITEMS_PER_PAGE)) {
-                return;
-            }
-            
-            currentPage = page;
-            
-            if (type === 'search' && currentSearchResults) {
-                displaySearchResults(currentSearchResults, currentSearchTerm, 'intech');
-            } else {
-                displayData(currentSearchResults || allData);
-            }
-            
-            $('html, body').animate({ scrollTop: $('#dataTable').offset().top - 100 }, 300);
-        }
-
-        // ============================================
-        // ฟังก์ชัน Utility
-        // ============================================
-
-        function clearSearch() {
-            currentSearchResults = null;
-            currentSearchTerm = '';
-            currentPage = 1;
-            
-            $('#searchIntechInput').val('');
-            $('#searchGeneralInput').val('');
-            $('#searchResults').html('');
-            
-            displayData(allData);
-            updateDataTitle('ข้อมูลทั้งหมด');
-            updateStatistics();
-            
-            showInfo('ล้างการค้นหาเรียบร้อยแล้ว');
-            $('#searchIntechInput').focus();
-        }
-
-        function updateDataTitle(title) {
-            $('#dataTitle').text(title);
-        }
-
-        function updateStatistics() {
-            const total = allData.length;
-            const showing = currentSearchResults ? currentSearchResults.length : total;
-            const columns = allData.length > 0 ? Object.keys(allData[0]).length : 0;
-            
-            const statsHtml = `
-                <div class="col-md-4">
-                    <div class="stats-card">
-                        <div class="stats-icon">
-                            <i class="fas fa-database"></i>
-                        </div>
-                        <div class="stats-value">${total.toLocaleString()}</div>
-                        <div class="stats-label">ข้อมูลทั้งหมด</div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="stats-card">
-                        <div class="stats-icon">
-                            <i class="fas fa-eye"></i>
-                        </div>
-                        <div class="stats-value">${showing.toLocaleString()}</div>
-                        <div class="stats-label">กำลังแสดง</div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="stats-card">
-                        <div class="stats-icon">
-                            <i class="fas fa-columns"></i>
-                        </div>
-                        <div class="stats-value">${columns}</div>
-                        <div class="stats-label">จำนวนคอลัมน์</div>
-                    </div>
-                </div>
-            `;
-            
-            $('#stats').html(statsHtml);
-        }
-
-        function checkAvailableColumns() {
-            if (allData.length === 0) return;
-            
-            const headers = Object.keys(allData[0]);
-            const intechColumns = CONFIG.INTECH_SEARCH_COLUMNS.filter(col => headers.includes(col));
-            const imageColumns = CONFIG.IMAGE_COLUMNS ? CONFIG.IMAGE_COLUMNS.filter(col => headers.includes(col)) : [];
-            
-            let html = `
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-columns me-2"></i>คอลัมน์ที่มีในข้อมูล
-                    </div>
-                    <div class="card-body">
-                        <p class="mb-2"><strong>คอลัมน์สำหรับค้นหาเลขแปลง:</strong></p>
-                        <div class="mb-3">
-                            ${intechColumns.map(col => 
-                                `<span class="badge bg-primary me-1 mb-1">${col}</span>`
-                            ).join('')}
-                        </div>
-                        ${imageColumns.length > 0 ? `
-                        <p class="mb-2"><strong>คอลัมน์รูปภาพ:</strong></p>
-                        <div class="mb-3">
-                            ${imageColumns.map(col => 
-                                `<span class="badge bg-success me-1 mb-1"><i class="fas fa-image me-1"></i>${col}</span>`
-                            ).join('')}
-                        </div>
-                        ` : ''}
-                        <p class="mb-2"><strong>คอลัมน์ทั้งหมด (${headers.length} คอลัมน์):</strong></p>
-                        <div>
-                            ${headers.map(col => 
-                                `<span class="badge bg-secondary me-1 mb-1">${col}</span>`
-                            ).join('')}
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            $('#availableColumns').html(html);
-        }
-
-        function showRowDetail(rowIndex) {
-            const row = allData[rowIndex];
-            const headers = Object.keys(row).filter(h => !h.startsWith('_'));
-            
-            // หารูปภาพหลัก (ถ้ามี)
-            let mainImage = null;
-            let mainImageColumn = '';
-            let mainImageFilename = '';
-            
-            if (CONFIG.IMAGE_COLUMNS) {
-                CONFIG.IMAGE_COLUMNS.forEach(col => {
-                    if (row[col] && row[col].trim() !== '' && !mainImage) {
-                        const imageInfo = GoogleDriveManager.parseInput(row[col]);
-                        if (imageInfo) {
-                            mainImage = imageInfo;
-                            mainImageColumn = col;
-                            mainImageFilename = imageInfo.type === 'drive' ? imageInfo.id : imageInfo.filename;
-                        }
-                    }
-                });
-            }
-            
-            let detailHtml = `
-                <div class="modal fade" id="detailModal" tabindex="-1">
-                    <div class="modal-dialog modal-xl">
-                        <div class="modal-content">
-                            <div class="modal-header bg-primary text-white">
-                                <h5 class="modal-title">
-                                    <i class="fas fa-info-circle me-2"></i>
-                                    รายละเอียดข้อมูล (แถวที่ ${rowIndex + 1})
-                                </h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-            `;
-            
-            // แสดงรูปภาพหลักใหญ่ (ถ้ามี)
-            if (mainImage) {
-                detailHtml += `
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <div class="card border-primary">
-                                <div class="card-header bg-primary text-white">
-                                    <i class="fas fa-image me-2"></i>รูปภาพผ่ากอ
-                                </div>
-                                <div class="card-body text-center">
-                                    <div class="mb-3">
-                                        ${GoogleDriveManager.createImageElement(mainImage, {
-                                            size: 'large',
-                                            clickable: true,
-                                            showActions: false
-                                        })}
-                                    </div>
-                                    <p class="mt-2 text-muted"><small>${mainImageFilename}</small></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            detailHtml += `<div class="row">`;
-            
-            headers.forEach((key, index) => {
-                const value = row[key] || '-';
-                const isIntechColumn = CONFIG.INTECH_SEARCH_COLUMNS.includes(key);
-                const isImageColumn = CONFIG.IMAGE_COLUMNS ? CONFIG.IMAGE_COLUMNS.includes(key) : false;
-                
-                // ข้ามคอลัมน์รูปภาพหลักถ้าได้แสดงแล้ว
-                if (isImageColumn && key === mainImageColumn) {
-                    return;
-                }
-                
-                detailHtml += `
-                    <div class="col-md-${isImageColumn ? '12' : '6'} mb-3">
-                        <label class="form-label ${isIntechColumn ? 'fw-bold text-primary' : isImageColumn ? 'fw-bold text-success' : 'text-muted'} small">
-                            ${formatHeader(key)}
-                            ${isIntechColumn ? '<i class="fas fa-search ms-1 small"></i>' : ''}
-                            ${isImageColumn ? '<i class="fas fa-image ms-1 small"></i>' : ''}
-                        </label>
-                        <div class="${isImageColumn ? 'image-container p-3 text-center' : 'form-control bg-light'}" style="${isImageColumn ? '' : 'min-height: 38px;'}">
-                            ${formatValue(value, key)}
-                        </div>
-                    </div>
-                `;
-            });
-            
-            detailHtml += `
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                <i class="fas fa-times me-1"></i> ปิด
-                            </button>
-                            <button type="button" class="btn btn-primary" onclick="copyRowData(${rowIndex})">
-                                <i class="fas fa-copy me-1"></i> คัดลอกข้อมูล
-                            </button>
-                            ${mainImage ? `
-                            <button type="button" class="btn btn-success" onclick="GoogleDriveManager.showImageModal(${JSON.stringify(mainImage)})">
-                                <i class="fas fa-expand me-1"></i> ดูรูปภาพเต็มขนาด
-                            </button>
-                            ` : ''}
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            $('body').append(detailHtml);
-            const modal = new bootstrap.Modal(document.getElementById('detailModal'));
-            modal.show();
-            
-            $('#detailModal').on('hidden.bs.modal', function() {
-                $(this).remove();
-            });
-        }
-
-        function copyRowData(rowIndex) {
-            const row = allData[rowIndex];
-            let text = '';
-            
-            Object.keys(row).forEach(key => {
-                if (!key.startsWith('_')) {
-                    text += `${formatHeader(key)}: ${row[key] || ''}\n`;
-                }
-            });
-            
-            navigator.clipboard.writeText(text).then(() => {
-                showSuccess('คัดลอกข้อมูลเรียบร้อยแล้ว');
-                bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide();
-            }).catch(err => {
-                showError('ไม่สามารถคัดลอกได้: ' + err.message);
-            });
-        }
-
-        function testConnection() {
-            showMessage('กำลังทดสอบการเชื่อมต่อ...', 'info');
-            
-            const testUrl = CONFIG.URL_METHODS[0].url;
-            console.log('🧪 ทดสอบการเชื่อมต่อกับ:', testUrl);
-            
-            fetch(testUrl)
-                .then(response => {
-                    if (response.ok) {
-                        showSuccess('การเชื่อมต่อกับ Google Sheet ทำงานปกติ');
-                    } else {
-                        showWarning('การเชื่อมต่อมีปัญหา (Status: ' + response.status + ')');
-                    }
-                })
-                .catch(error => {
-                    showError('ไม่สามารถเชื่อมต่อได้: ' + error.message);
-                });
-        }
-
-        function viewRawData() {
-            if (allData.length === 0) {
-                showWarning('ยังไม่มีข้อมูล');
-                return;
-            }
-            
-            const firstRow = allData[0];
-            const headers = Object.keys(firstRow).filter(h => !h.startsWith('_'));
-            
-            let rawHtml = `
-                <div class="modal fade" id="rawDataModal" tabindex="-1">
-                    <div class="modal-dialog modal-xl">
-                        <div class="modal-content">
-                            <div class="modal-header bg-dark text-white">
-                                <h5 class="modal-title">
-                                    <i class="fas fa-code me-2"></i>
-                                    ข้อมูลดิบ (5 แถวแรก)
-                                </h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <pre style="max-height: 500px; overflow: auto; background: #f8f9fa; padding: 15px; border-radius: 5px;">
-            `;
-            
-            // แสดง 5 แถวแรก
-            for (let i = 0; i < Math.min(5, allData.length); i++) {
-                const row = allData[i];
-                rawHtml += `\n=== แถวที่ ${i + 1} ===\n`;
-                
-                headers.forEach(header => {
-                    rawHtml += `${header}: ${JSON.stringify(row[header] || '')}\n`;
-                });
-            }
-            
-            rawHtml += `
-                                </pre>
-                                <div class="mt-3">
-                                    <p><strong>สรุป:</strong></p>
-                                    <ul>
-                                        <li>จำนวนแถวทั้งหมด: ${allData.length}</li>
-                                        <li>จำนวนคอลัมน์: ${headers.length}</li>
-                                        <li>คอลัมน์แรก: ${headers[0] || 'ไม่มี'}</li>
-                                        ${CONFIG.IMAGE_COLUMNS ? `<li>คอลัมน์รูปภาพ: ${CONFIG.IMAGE_COLUMNS.filter(col => headers.includes(col)).join(', ')}</li>` : ''}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            $('body').append(rawHtml);
-            const modal = new bootstrap.Modal(document.getElementById('rawDataModal'));
-            modal.show();
-            
-            $('#rawDataModal').on('hidden.bs.modal', function() {
-                $(this).remove();
-            });
-        }
-
-        function exportData() {
-            if (allData.length === 0) {
-                showWarning('ไม่มีข้อมูลที่จะส่งออก');
-                return;
-            }
-            
-            const dataToExport = currentSearchResults || allData;
-            const headers = Object.keys(dataToExport[0]).filter(h => !h.startsWith('_'));
-            
-            const csvRows = [];
-            csvRows.push(headers.join(','));
-            
-            dataToExport.forEach(row => {
-                const values = headers.map(header => {
-                    const val = row[header] || '';
-                    return `"${String(val).replace(/"/g, '""')}"`;
-                });
-                csvRows.push(values.join(','));
-            });
-            
-            const csv = csvRows.join('\n');
-            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            
-            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-            const filename = currentSearchResults ? 
-                `IN-TECH_Search_${currentSearchTerm}_${timestamp}.csv` : 
-                `IN-TECH_Data_${timestamp}.csv`;
-            
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            
-            showSuccess('ดาวน์โหลดข้อมูลเรียบร้อยแล้ว: ' + filename);
-        }
-
-        function exportSearchResults() {
-            exportData();
-        }
-
-        function printSearchResults() {
-            window.print();
-        }
-
-        // ============================================
-        // ฟังก์ชันจัดการแคช
-        // ============================================
 
         function cacheData(data) {
             try {
                 const cacheData = {
                     data: data,
-                    timestamp: Date.now(),
-                    method: CONFIG.URL_METHODS[currentMethodIndex].name
+                    timestamp: Date.now()
                 };
-                localStorage.setItem('intechDataCache', JSON.stringify(cacheData));
-                console.log('💾 แคชข้อมูลเรียบร้อยแล้ว');
+                localStorage.setItem('dashboardDataCache', JSON.stringify(cacheData));
             } catch (e) {
                 console.warn('⚠️ ไม่สามารถแคชข้อมูลได้:', e);
             }
@@ -1670,14 +1877,14 @@
 
         function getCachedData() {
             try {
-                const cached = localStorage.getItem('intechDataCache');
+                const cached = localStorage.getItem('dashboardDataCache');
                 if (!cached) return null;
                 
                 const cacheData = JSON.parse(cached);
                 const age = Date.now() - cacheData.timestamp;
                 
                 if (age < CONFIG.CACHE_DURATION) {
-                    console.log('📂 โหลดข้อมูลจากแคช (อายุ: ' + Math.round(age/1000) + ' วินาที)');
+                    console.log('📂 โหลดข้อมูลจากแคช');
                     return cacheData.data;
                 } else {
                     console.log('🗑️ แคชหมดอายุแล้ว');
@@ -1689,231 +1896,162 @@
             }
         }
 
-        function clearCache() {
-            localStorage.removeItem('intechDataCache');
-            console.log('🧹 ล้างแคชเรียบร้อยแล้ว');
+        // Report functions
+        function exportSummaryReport() {
+            showInfo('กำลังสร้างรายงานสรุป PDF...');
+            // ในที่นี้ควรเชื่อมต่อกับ PDF generation service
         }
 
-        // ============================================
-        // ฟังก์ชันจัดการประวัติการค้นหา
-        // ============================================
-
-        function saveToSearchHistory(searchData) {
-            searchHistory.unshift(searchData);
+        function exportDetailedReport() {
+            const csvData = filteredData.map(row => {
+                return Object.values(row).join(',');
+            }).join('\n');
             
-            // เก็บเฉพาะ 10 รายการล่าสุด
-            if (searchHistory.length > 10) {
-                searchHistory = searchHistory.slice(0, 10);
-            }
+            const blob = new Blob(['\uFEFF' + csvData], { type: 'text/csv;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
             
-            localStorage.setItem('intechSearchHistory', JSON.stringify(searchHistory));
+            a.href = url;
+            a.download = `รายงานโครงการผ่ากอ_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            showSuccess('ดาวน์โหลดรายงาน Excel เรียบร้อยแล้ว');
         }
 
-        function loadSearchHistory() {
-            try {
-                const saved = localStorage.getItem('intechSearchHistory');
-                if (saved) {
-                    searchHistory = JSON.parse(saved);
-                }
-            } catch (e) {
-                console.warn('⚠️ ปัญหาในการโหลดประวัติ:', e);
-            }
+        function exportCustomReport() {
+            showInfo('เปิดระบบสร้างรายงานกำหนดเอง...');
+            // เปิด modal สำหรับเลือกรายงานกำหนดเอง
         }
 
-        function showSearchHistory() {
-            if (searchHistory.length === 0) {
-                showInfo('ยังไม่มีประวัติการค้นหา');
-                return;
-            }
-            
-            let historyHtml = `
-                <div class="modal fade" id="historyModal" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header bg-info text-white">
-                                <h5 class="modal-title">
-                                    <i class="fas fa-history me-2"></i>
-                                    ประวัติการค้นหา
-                                </h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="list-group">
-            `;
-            
-            searchHistory.forEach((item, index) => {
-                const time = new Date(item.timestamp).toLocaleString('th-TH');
-                historyHtml += `
-                    <div class="list-group-item">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">
-                                <span class="badge ${item.type.includes('IN-TECH') ? 'bg-primary' : item.type.includes('รูปภาพ') ? 'bg-success' : 'bg-secondary'} me-2">
-                                    ${item.type}
-                                </span>
-                                "${item.keyword}"
-                            </h6>
-                            <small>${time}</small>
-                        </div>
-                        <p class="mb-1 small">พบ ${item.results} รายการ</p>
-                        <button class="btn btn-sm btn-outline-primary mt-1" onclick="reSearchFromHistory('${item.keyword}')">
-                            <i class="fas fa-redo me-1"></i> ค้นหาอีกครั้ง
-                        </button>
-                    </div>
-                `;
-            });
-            
-            historyHtml += `
+        function generateMonthlyReport() {
+            const month = $('#monthSelect').val();
+            showInfo(`กำลังสร้างรายงานประจำเดือน... ${month}`);
+            // สร้างรายงานประจำเดือน
+        }
+
+        function loadMap() {
+            showInfo('กำลังโหลดแผนที่...');
+            // โหลดแผนที่
+            $('#mapContainer').html(`
+                <div class="text-center">
+                    <i class="fas fa-map-marked-alt fa-4x text-primary mb-3"></i>
+                    <h5>แผนที่การกระจายแปลงเกษตร</h5>
+                    <p class="text-muted">แสดงตำแหน่งแปลงเกษตรตามเขตพื้นที่</p>
+                    <div class="mt-4">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6>เหนือ</h6>
+                                        <h4>${Math.floor(filteredData.length * 0.3)}</h4>
+                                        <small>แปลง</small>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
-                                <button type="button" class="btn btn-danger" onclick="clearSearchHistory()">
-                                    <i class="fas fa-trash me-1"></i> ล้างประวัติ
-                                </button>
+                            <div class="col-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6>ตะวันออกเฉียงเหนือ</h6>
+                                        <h4>${Math.floor(filteredData.length * 0.4)}</h4>
+                                        <small>แปลง</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            `;
+            `);
+        }
+
+        // Create other charts
+        function createProgressChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
             
-            $('body').append(historyHtml);
-            const modal = new bootstrap.Modal(document.getElementById('historyModal'));
-            modal.show();
+            // Sample data
+            const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.'];
+            const target = [100, 100, 100, 100, 100, 100];
+            const actual = [20, 45, 60, 75, 85, 90];
             
-            $('#historyModal').on('hidden.bs.modal', function() {
-                $(this).remove();
+            charts.progressChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'เป้าหมาย',
+                            data: target,
+                            backgroundColor: 'rgba(200, 200, 200, 0.5)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'ผลดำเนินการ',
+                            data: actual,
+                            backgroundColor: 'rgba(52, 168, 83, 0.7)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'เปอร์เซ็นต์'
+                            }
+                        }
+                    }
+                }
             });
         }
 
-        function reSearchFromHistory(keyword) {
-            $('#searchIntechInput').val(keyword);
-            searchIntech();
-            bootstrap.Modal.getInstance(document.getElementById('historyModal')).hide();
-        }
-
-        function clearSearchHistory() {
-            searchHistory = [];
-            localStorage.removeItem('intechSearchHistory');
-            showSuccess('ล้างประวัติการค้นหาเรียบร้อยแล้ว');
-            bootstrap.Modal.getInstance(document.getElementById('historyModal')).hide();
-        }
-
-        // ============================================
-        // Helper Functions
-        // ============================================
-
-        function showLoading(show) {
-            if (show) {
-                $('#loading').show();
-                $('#dataSection').hide();
-                $('#statsContainer').hide();
-                $('#availableColumns').hide();
-            } else {
-                $('#loading').hide();
-                $('#dataSection').show();
-                $('#statsContainer').show();
-                $('#availableColumns').show();
-            }
-        }
-
-        function showMessage(text, type) {
-            const icons = {
-                success: 'check-circle',
-                error: 'exclamation-circle',
-                warning: 'exclamation-triangle',
-                info: 'info-circle'
-            };
+        function createDistributionChart() {
+            const ctx = document.getElementById('distributionChart').getContext('2d');
             
-            const html = `
-                <div class="alert alert-${type} alert-dismissible fade show">
-                    <i class="fas fa-${icons[type]} me-2"></i>
-                    ${text}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `;
+            // Sample data
+            const labels = ['0-10 วัน', '11-20 วัน', '21-30 วัน', '31-40 วัน', '41-50 วัน', '51-60 วัน'];
+            const data = [15, 25, 35, 20, 10, 5];
             
-            $('#messages').html(html);
-            
-            // อัตโนมัติปิดหลังจาก 5 วินาที
-            setTimeout(() => {
-                $('.alert').alert('close');
-            }, 5000);
-        }
-
-        function showSuccess(text) { showMessage(text, 'success'); }
-        function showError(text) { showMessage(text, 'danger'); }
-        function showWarning(text) { showMessage(text, 'warning'); }
-        function showInfo(text) { showMessage(text, 'info'); }
-
-        function formatHeader(header) {
-            if (header.length > 20) {
-                return header.substring(0, 17) + '...';
-            }
-            return header;
-        }
-
-        function formatValue(value, columnName = '') {
-            if (value === null || value === undefined || value === '') {
-                return '<span class="text-muted">-</span>';
-            }
-            
-            const str = String(value).trim();
-            
-            // ตรวจสอบว่าเป็นคอลัมน์รูปภาพ
-            const isImageColumn = CONFIG.IMAGE_COLUMNS ? 
-                CONFIG.IMAGE_COLUMNS.some(col => columnName.includes(col)) : false;
-            
-            if (isImageColumn) {
-                const imageInfo = GoogleDriveManager.parseInput(str);
-                if (imageInfo) {
-                    const imageHtml = GoogleDriveManager.createImageElement(imageInfo, {
-                        size: 'small',
-                        clickable: true,
-                        showActions: false
-                    });
-                    
-                    // Add click handler
-                    return imageHtml.replace(
-                        'class="img-thumbnail preview-image',
-                        `class="img-thumbnail preview-image" onclick="GoogleDriveManager.showImageModal(${JSON.stringify(imageInfo)})"`
-                    );
+            charts.distributionChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'การกระจายตัว',
+                        data: data,
+                        backgroundColor: 'rgba(26, 115, 232, 0.2)',
+                        borderColor: '#1a73e8',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#1a73e8'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true
+                        }
+                    }
                 }
-                return GoogleDriveManager.createPlaceholder();
-            }
-            
-            // ถ้าเป็นตัวเลข
-            if (!isNaN(str) && str !== '' && !str.includes('/')) {
-                const num = Number(str);
-                return num.toLocaleString('th-TH');
-            }
-            
-            // ถ้าเป็นวันที่ไทย
-            const thaiDateRegex = /(\d{1,2})\/(\d{1,2})\/(\d{4})/;
-            if (thaiDateRegex.test(str)) {
-                return str;
-            }
-            
-            // ตรวจสอบว่าเป็น Google Drive URL
-            if (str.includes('drive.google.com') || str.match(/^[a-zA-Z0-9_-]{33}$/)) {
-                const imageInfo = GoogleDriveManager.parseInput(str);
-                if (imageInfo) {
-                    return GoogleDriveManager.createImageElement(imageInfo, {
-                        size: 'small',
-                        clickable: true,
-                        showActions: false
-                    });
-                }
-            }
-            
-            // ข้อความธรรมดา
-            return str.replace(/\n/g, '<br>');
+            });
         }
 
-        // Initialize when page loads
-        console.log('✅ ระบบค้นหาเลขแปลง IN-TECH พร้อมใช้งาน');
-        console.log('📊 โครงการ:', CONFIG.PROJECT_NAME);
-        console.log('🔗 Sheet ID:', CONFIG.SHEET_ID);
-        console.log('🖼️ คอลัมน์รูปภาพ:', CONFIG.IMAGE_COLUMNS ? CONFIG.IMAGE_COLUMNS.join(', ') : 'ไม่มี');
+        console.log('✅ Dashboard พร้อมใช้งาน');
     </script>
 </body>
 </html>
